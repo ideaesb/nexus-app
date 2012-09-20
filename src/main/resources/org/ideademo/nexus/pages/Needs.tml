@@ -1,0 +1,257 @@
+<html t:type="layout" title="needs"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+ 
+<body id="bg2">
+    <ul id="nav">
+     <li><a href="../index.php"><span>Home</span></a></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Needs</u></t:pagelink></li>
+     <li><a href="javascript:alert('Under Construction');" title="Data, Products &amp; Services"><span>Data, Products &amp; Services</span></a></li>
+     <li><a href="javascript:alert('Under Construction');" title="Projects &amp; Activities"><span>Projects &amp; Activities</span></a></li>
+     <li><a href="javascript:alert('Under Construction');" title="Partners &amp; Programs"><span>Partners &amp; Programs</span></a></li>
+     <li><a href="javascript:alert('Under Construction');" title="Bibliography"><span>Bibliography</span></a></li>
+    </ul>
+    
+
+    <div id = "bodyContainer"> 
+		<div id ="searchContainer">
+		
+		 <form t:type="form" t:id="searchCriteria" action="needs" method="post">
+		   <table width="750">
+		   <tr>
+		      <td width="245">
+		        <t:label for="data"/>:<br />
+		        <t:select t:id="data" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="products"/>:<br />
+		        <t:select t:id="products" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="services"/>:<br />
+		        <t:select t:id="services" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+	      </tr>
+		   <tr>
+		      <td width="245">
+		        <t:label for="discipline"/>:<br />
+		        <t:select t:id="discipline" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="sector"/>:<br />
+		        <t:select t:id="sector" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="regions"/>:<br />
+		        <t:select t:id="regions" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      </tr>
+		    </table>
+		   
+		
+		    <table width="750" style="border-collapse: collapse; border-spacing: 0;">
+		     <tr class="title-blue" border="1">
+		        <td  align="right" width="150">Search</td>
+		        <td align="left">
+                   <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
+                   <t:submit t:id="search" value="Go" />
+                   <t:submit t:id="clear" value="Clear/Show All" />
+                   (<t:pagelink page="need/search" target="_blank">Advanced</t:pagelink>)
+                 </td>
+		      </tr>
+		    </table>
+		   </form>
+		</div><!-- End of "searchContainer" -->
+    
+
+
+ <div id="container3"><!-- Contains the accordion. Allows for padding on the top of the accordion to fit and look better on page-->
+  <div id="container2"><!-- This contains the scroll css code. -->
+   <div id="Accordion1" class="Accordion" tabindex="0">
+
+
+   
+     <div class="AccordionPanel" t:type="Loop" t:source="list" t:value="row">
+      <div class="AccordionPanelTab">
+
+       <table class="project-box">
+        <colgroup>
+          <col class="title-blue" />
+        </colgroup>
+        <tr>
+         <td width="67" style="width: 67px">Name</td>
+         <td>${row.name}</td>
+        </tr>
+       </table>
+
+    </div><!-- End Accordion Panel Tab -->
+
+
+    <div class="AccordionPanelContent"><!--added by cameron-->
+
+    <table class="project-box">
+     <colgroup>
+      <col class="title-blue" />
+     </colgroup>
+     <tr>
+      <td>Description</td>
+      <td>${row.description}(<t:pagelink page="need/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+     </tr>
+     
+     <tr>
+      <td>Type</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+       
+        <t:if test="${row.insituObservations}"><li style="margin-left: 13px;">Data: ${message:INSITU}</li></t:if> 
+        <t:if test="${row.satelliteRemoteObservations}"><li style="margin-left: 13px;">Data: ${message:SATELLITE}</li></t:if> 
+        <t:if test="${row.observingSystems}"><li style="margin-left: 13px;">Data: ${message:OBS}</li></t:if> 
+        <t:if test="${row.surveysAndPreliminaryAssessments}"><li style="margin-left: 13px;">Data: ${message:SURVEYS}</li></t:if> 
+        <t:if test="${row.indicatorBasedResearch}"><li style="margin-left: 13px;">Data: ${message:INDI}</li></t:if> 
+        <t:if test="${row.reanalysisProducts}"><li style="margin-left: 13px;">Data: ${message:REANAL}</li></t:if> 
+        <t:if test="${row.depthAndElevationData}"><li style="margin-left: 13px;">Data: ${message:DEPTH}</li></t:if> 
+        <t:if test="${row.dataStewardshipAndProvisions}"><li style="margin-left: 13px;">Data: ${message:PROV}</li></t:if> 
+        <t:if test="${row.otherData}"><li style="margin-left: 13px;">Data: ${message:ODATA}</li></t:if>
+         
+        <t:if test="${row.hindcasts}"><li style="margin-left: 13px;">Products: ${message:HIND}</li></t:if> 
+        <t:if test="${row.forecastsAndOutlooks}"><li style="margin-left: 13px;">Products: ${message:FORE}</li></t:if> 
+        <t:if test="${row.projections}"><li style="margin-left: 13px;">Products: ${message:PROJ}</li></t:if> 
+        <t:if test="${row.maps}"><li style="margin-left: 13px;">Products: ${message:MAPS}</li></t:if> 
+        <t:if test="${row.assessments}"><li style="margin-left: 13px;">Products: ${message:PLANS}</li></t:if> 
+        <t:if test="${row.otherProducts}"><li style="margin-left: 13px;">Products: ${message:OPRD}</li></t:if> 
+        
+        <t:if test="${row.engagement}"><li style="margin-left: 13px;">Services: ${message:ENG}</li></t:if> 
+        <t:if test="${row.education}"><li style="margin-left: 13px;">Services: ${message:EDU}</li></t:if> 
+        <t:if test="${row.trainingAndCapacityBuilding}"><li style="margin-left: 13px;">Services: ${message:TRA}</li></t:if> 
+        <t:if test="${row.viewersAndWebBasedTools}"><li style="margin-left: 13px;">Services: ${message:DSS}</li></t:if> 
+        <t:if test="${row.managementGuidance}"><li style="margin-left: 13px;">Services: ${message:MGMT}</li></t:if> 
+        <t:if test="${row.policyGuidance}"><li style="margin-left: 13px;">Services: ${message:GUID}</li></t:if> 
+        <t:if test="${row.otherServices}"><li style="margin-left: 13px;">Services: ${message:OSER}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+
+     <tr>
+      <td>Priority</td>
+      <td>
+        <t:if test="${row.high}"><img src="${context:layout/images/high.jpg}" alt="High" title="High" /></t:if> 
+        <t:if test="${row.mid}"><img src="${context:layout/images/mid.jpg}" alt="Mid" title="Mid" /></t:if> 
+        <t:if test="${row.low}"><img src="${context:layout/images/low.jpg}" alt="Low" title="Low" /></t:if>
+        <t:if test="${row.unknown}"><ul style="display: inline;margin-left: 0;padding-left: 0;"><li style="margin-left: 13px;">Unknown</li></ul></t:if>
+       </td>
+     </tr>
+     
+     
+     <tr>
+      <td>Focus Area</td>
+      <td>
+        <t:if test="${row.sustainability}"><img src="${context:layout/images/sustainability.jpg}" alt="${message:SUSTAINABILITY}" title="${message:SUSTAINABILITY}" /></t:if> 
+        <t:if test="${row.resilience}"><img src="${context:layout/images/resilience.jpg}" alt="${message:RESILIENCE}" title="${message:RESILIENCE}" /></t:if> 
+        <t:if test="${row.water}"><img src="${context:layout/images/water.jpg}" alt="${message:WATER}" title="${message:WATER}" /></t:if>
+        <t:if test="${row.extremes}"><img src="${context:layout/images/extremes.jpg}" alt="${message:EXTREMES}" title="${message:EXTREMES}" /></t:if> 
+        <t:if test="${row.conservation}"><img src="${context:layout/images/conservation.jpg}" alt="${message:CONSERVATION}" title="${message:CONSERVATION}" /></t:if>
+       </td>
+     </tr>
+          
+     <tr>
+      <td>Discipline</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.physical}"><li style="margin-left: 13px;">${message:PHY}</li></t:if> 
+        <t:if test="${row.ecologicalAndBiological}"><li style="margin-left: 13px;">${message:BIO}</li></t:if> 
+        <t:if test="${row.geological}"><li style="margin-left: 13px;">${message:GEO}</li></t:if> 
+        <t:if test="${row.chemical}"><li style="margin-left: 13px;">${message:CHEM}</li></t:if> 
+        <t:if test="${row.climateSocietyInteractions}"><li style="margin-left: 13px;">${message:SOCIO}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+     
+          
+     <tr>
+      <td>Sector</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.publicHealth}"><li style="margin-left: 13px;">${message:PUBLIC}</li></t:if> 
+        <t:if test="${row.infrastructure}"><li style="margin-left: 13px;">${message:INFRA}</li></t:if> 
+        <t:if test="${row.managedEcosystems}"><li style="margin-left: 13px;">${message:MECO}</li></t:if> 
+        <t:if test="${row.naturalEcosystems}"><li style="margin-left: 13px;">${message:NECO}</li></t:if> 
+        <t:if test="${row.biota}"><li style="margin-left: 13px;">${message:BIOTA}</li></t:if> 
+        <t:if test="${row.cultural}"><li style="margin-left: 13px;">${message:CULT}</li></t:if> 
+        <t:if test="${row.economicResources}"><li style="margin-left: 13px;">${message:ECORES}</li></t:if> 
+        <t:if test="${row.recreationAndTourism}"><li style="margin-left: 13px;">${message:REC}</li></t:if> 
+        <t:if test="${row.crossDisciplinary}"><li style="margin-left: 13px;">${message:CROSS}</li></t:if> 
+        <t:if test="${row.otherSector}"><li style="margin-left: 13px;">${message:OSEC}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+
+     
+     <tr>
+      <td>Region</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.international}"><li style="margin-left: 13px;">${message:INT}</li></t:if> 
+        <t:if test="${row.national}"><li style="margin-left: 13px;">${message:NAT}</li></t:if> 
+        <t:if test="${row.regionalOrState}"><li style="margin-left: 13px;">${message:REG}</li></t:if> 
+        <t:if test="${row.localCity}"><li style="margin-left: 13px;">${message:LOC}</li></t:if> 
+        <t:if test="${row.problemFocused}"><li style="margin-left: 13px;">${message:OTH}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+     
+     <tr>
+      <td>Source</td>
+      <td>${row.source}</td>
+     </tr>
+
+     <tr>
+      <td>Links</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+         <t:if test="${row.data}"><li style="margin-left: 13px;">Data: ${row.data}</li></t:if>
+         <t:if test="${row.products}"><li style="margin-left: 13px;">Products: ${row.products}</li></t:if>
+         <t:if test="${row.services}"><li style="margin-left: 13px;">Data: ${row.services}</li></t:if>
+       </ul>
+      </td>
+     </tr>
+
+
+     <tr>
+      <td>Lead Agencies</td>
+      <td>${row.organization}</td>
+     </tr>
+
+     <tr>
+      <td>Contacts</td>
+      <td>${row.contact}</td>
+     </tr>
+
+
+    </table>
+
+        <!-- Column 1 end -->
+    </div><!-- End of AccordionPanelContent -->
+   </div><!-- End of AccordionPanel (both content and tab)  -->
+
+
+   </div><!-- End of Accordion 1 -->
+  </div><!-- End of "container 2" -->
+ </div><!-- End of "container 3" -->
+
+  
+    
+    
+    </div><!--end of bodyContainer-->
+    
+<script type="text/javascript"><!--added by cameron-->
+var Accordion1 = new Spry.Widget.Accordion("Accordion1",{useFixedPanelHeights: false, defaultPanel: -1 });
+</script><!--(works only if loaded at end) -->
+
+</body>
+</html>
