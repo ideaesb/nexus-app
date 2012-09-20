@@ -1,8 +1,435 @@
-<html t:type="viewneed" title="ADVANCED Search"
+<html t:type="longform" title="Need Worksheet"
       xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
       xmlns:p="tapestry:parameter">
       
- <body>
+<body>
+   <t:form t:id="need" class="appnitro">
+   
+   <div class="form_description">
+     <h2>Eastern Region RCSD NEEDS Worksheet</h2>
+     <p>Use this form to add or update a climate needs assessment to Nexus (Worsheet Version April 27 2012)</p>
+   </div>		
+   
+   <t:errors/>
+
+   <ul>
+   
+     <li id="li_code">
+      <t:label class="description" for="code" />
+      <t:textField t:id="code" t:validate="maxlength=255" size="15" value="entity.code" />
+     </li>
      
+     <li id="li_name">
+      <t:label class="description" for="name" />
+      <div>
+       <t:textArea t:id="name" t:validate="maxlength=255" rows="3" cols="90" value="entity.name" />
+      </div>
+     </li>
+
+     <li id="li_agency">
+      <t:label class="description" for="organization" />
+      <div>
+       <t:textArea t:id="organization" t:validate="maxlength=255" rows="3" cols="90" value="entity.organization" />
+      </div>
+     </li>
+
+     <li id="li_contact">
+      <t:label class="description" for="contact" />
+      <div>
+       <t:textArea t:id="contact" t:validate="maxlength=255" rows="2" cols="90" value="entity.contact" />
+      </div>
+     </li>
+    	<li id="li_url">
+	<t:label class="description" for="url" />
+	<t:textArea t:id="url" t:validate="maxlength=255" rows="3" cols="90" value="entity.url" />
+	</li>
+	<li id="li_description">
+	<t:label class="description" for="description" />
+	<t:textArea t:id="description" t:validate="maxlength=4096" rows="5" cols="90" value="entity.description" />
+	</li>
+	<li id="li_keywords">
+	<t:label class="description" for="keywords" />
+	<t:textArea t:id="keywords" t:validate="maxlength=4096" rows="5" cols="90" value="entity.keywords" />
+	</li>
+	<li id="li_objectives">
+	<t:label class="description" for="objectives" />
+	<t:textArea t:id="objectives" t:validate="maxlength=255" rows="3" cols="90" value="entity.objectives" />
+	</li>
+	<li id="li_worksheet">
+	<t:label class="description" for="worksheet" />
+	<t:textArea t:id="worksheet" t:validate="maxlength=255" rows="3" cols="90" value="entity.worksheet" />
+	</li>
+	<li id="li_source">
+	<t:label class="description" for="source" />
+	<t:textArea t:id="source" t:validate="maxlength=255" rows="3" cols="90" value="entity.source" />
+	</li>
+	<li id="li_requestor">
+	<t:label class="description" for="requestor" />
+	<t:textArea t:id="requestor" t:validate="maxlength=255" rows="3" cols="90" value="entity.requestor" />
+	</li>
+	<li id="li_feedback">
+	<t:label class="description" for="feedback" />
+	<t:textArea t:id="feedback" t:validate="maxlength=255" rows="3" cols="90" value="entity.feedback" />
+	</li>
+	<li id="li_data">
+	<t:label class="description" for="data" />
+	<t:textArea t:id="data" t:validate="maxlength=255" rows="3" cols="90" value="entity.data" />
+	</li>
+	<li id="li_products">
+	<t:label class="description" for="products" />
+	<t:textArea t:id="products" t:validate="maxlength=255" rows="3" cols="90" value="entity.products" />
+	</li>
+	<li id="li_services">
+	<t:label class="description" for="services" />
+	<t:textArea t:id="services" t:validate="maxlength=255" rows="3" cols="90" value="entity.services" />
+	</li>
+	<li id="li_programs">
+	<t:label class="description" for="programs" />
+	<t:textArea t:id="programs" t:validate="maxlength=255" rows="3" cols="90" value="entity.programs" />
+	</li>
+	<li id="li_projects">
+	<t:label class="description" for="projects" />
+	<t:textArea t:id="projects" t:validate="maxlength=255" rows="3" cols="90" value="entity.projects" />
+	</li>
+	<li id="li_comments">
+	<t:label class="description" for="comments" />
+	<t:textArea t:id="comments" t:validate="maxlength=2098" rows="3" cols="90" value="entity.comments" />
+	</li>
+		
+     
+     
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('statusBox');" title="Show or Hide">Status</legend>
+       <div id="statusBox" class="unhidden">
+        <t:checkbox t:id="ongoing" t:value="entity.ongoing" class="element checkbox" /><t:label for="ongoing" class="choice"/>
+        <t:checkbox t:id="planned" t:value="entity.planned" class="element checkbox" /><t:label for="planned" class="choice"/>
+        <t:checkbox t:id="proposed" t:value="entity.proposed" class="element checkbox" /><t:label for="proposed" class="choice"/>
+        <t:checkbox t:id="completed" t:value="entity.completed" class="element checkbox" /><t:label for="completed" class="choice" />
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('priorityBox');" title="Show or Hide">Priority</legend>
+       <div id="priorityBox" class="unhidden">
+		<t:checkbox t:id="high" t:value="entity.high"  class="element checkbox" /><t:label for="high" class="choice" />
+		<t:checkbox t:id="mid" t:value="entity.mid"  class="element checkbox" /><t:label for="mid" class="choice" />
+		<t:checkbox t:id="low" t:value="entity.low"  class="element checkbox" /><t:label for="low" class="choice" />
+		<t:checkbox t:id="unknown" t:value="entity.unknown"  class="element checkbox" /><t:label for="unknown" class="choice" />
+
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('focusBox');" title="Show or Hide">Focus Area</legend>
+       <div id="focusBox" class="unhidden">
+
+		<t:checkbox t:id="sustainability" t:value="entity.sustainability"  class="element checkbox" /><t:label for="sustainability" class="choice" />
+		<t:checkbox t:id="resilience" t:value="entity.resilience"  class="element checkbox" /><t:label for="resilience" class="choice" />
+		<t:checkbox t:id="water" t:value="entity.water"  class="element checkbox" /><t:label for="water" class="choice" />
+		<t:checkbox t:id="extremes" t:value="entity.extremes"  class="element checkbox" /><t:label for="extremes" class="choice" />
+		<t:checkbox t:id="conservation" t:value="entity.conservation"  class="element checkbox" /><t:label for="conservation" class="choice" />
+	
+
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('aoaBox');" title="Show or Hide">Area of Applicability</legend>
+       <div id="aoaBox" class="unhidden">
+
+		<t:checkbox t:id="international" t:value="entity.international"  class="element checkbox" /><t:label for="international" class="choice" />
+		<t:checkbox t:id="canada" t:value="entity.canada"  class="element checkbox indent" /><t:label for="canada" class="indent" />
+		<t:checkbox t:id="newBrunswick" t:value="entity.newBrunswick"  class="element checkbox indent2" /><t:label for="newBrunswick" class="indent2" />
+		<t:checkbox t:id="novaScotia" t:value="entity.novaScotia"  class="element checkbox indent2" /><t:label for="novaScotia" class="indent2" />
+		<t:checkbox t:id="quebec" t:value="entity.quebec"  class="element checkbox indent2" /><t:label for="quebec" class="indent2" />
+		<t:checkbox t:id="princeEdwardIsland" t:value="entity.princeEdwardIsland"  class="element checkbox indent2" /><t:label for="princeEdwardIsland" class="indent2" />
+		<t:checkbox t:id="newfoundland" t:value="entity.newfoundland"  class="element checkbox indent2" /><t:label for="newfoundland" class="indent2" />
+		<t:checkbox t:id="labrador" t:value="entity.labrador"  class="element checkbox indent2" /><t:label for="labrador" class="indent2" />
+		<t:checkbox t:id="national" t:value="entity.national"  class="element checkbox" /><t:label for="national" class="choice" />
+		<t:checkbox t:id="regionalOrState" t:value="entity.regionalOrState"  class="element checkbox" /><t:label for="regionalOrState" class="choice" />
+		<t:checkbox t:id="newEngland" t:value="entity.newEngland"  class="element checkbox indent" /><t:label for="newEngland" class="indent" />
+		<t:checkbox t:id="maine" t:value="entity.maine"  class="element checkbox indent2" /><t:label for="maine" class="indent2" />
+		<t:checkbox t:id="newHampshire" t:value="entity.newHampshire"  class="element checkbox indent2" /><t:label for="newHampshire" class="indent2" />
+		<t:checkbox t:id="massachusetts" t:value="entity.massachusetts"  class="element checkbox indent2" /><t:label for="massachusetts" class="indent2" />
+		<t:checkbox t:id="vermont" t:value="entity.vermont"  class="element checkbox indent2" /><t:label for="vermont" class="indent2" />
+		<t:checkbox t:id="connecticut" t:value="entity.connecticut"  class="element checkbox indent2" /><t:label for="connecticut" class="indent2" />
+		<t:checkbox t:id="rhodeIsland" t:value="entity.rhodeIsland"  class="element checkbox indent2" /><t:label for="rhodeIsland" class="indent2" />
+		<t:checkbox t:id="midAtlantic" t:value="entity.midAtlantic"  class="element checkbox indent" /><t:label for="midAtlantic" class="indent" />
+		<t:checkbox t:id="newYork" t:value="entity.newYork"  class="element checkbox indent2" /><t:label for="newYork" class="indent2" />
+		<t:checkbox t:id="newJersey" t:value="entity.newJersey"  class="element checkbox indent2" /><t:label for="newJersey" class="indent2" />
+		<t:checkbox t:id="pennsylvania" t:value="entity.pennsylvania"  class="element checkbox indent2" /><t:label for="pennsylvania" class="indent2" />
+		<t:checkbox t:id="marlyland" t:value="entity.marlyland"  class="element checkbox indent2" /><t:label for="marlyland" class="indent2" />
+		<t:checkbox t:id="delaware" t:value="entity.delaware"  class="element checkbox indent2" /><t:label for="delaware" class="indent2" />
+		<t:checkbox t:id="virginia" t:value="entity.virginia"  class="element checkbox indent2" /><t:label for="virginia" class="indent2" />
+		<t:checkbox t:id="districtOfColumbia" t:value="entity.districtOfColumbia"  class="element checkbox indent2" /><t:label for="districtOfColumbia" class="indent2" />
+		<t:checkbox t:id="central" t:value="entity.central"  class="element checkbox indent" /><t:label for="central" class="indent" />
+		<t:checkbox t:id="westVirginia" t:value="entity.westVirginia"  class="element checkbox indent2" /><t:label for="westVirginia" class="indent2" />
+		<t:checkbox t:id="greatLakes" t:value="entity.greatLakes"  class="element checkbox indent" /><t:label for="greatLakes" class="indent" />
+		<t:checkbox t:id="ohio" t:value="entity.ohio"  class="element checkbox indent2" /><t:label for="ohio" class="indent2" />
+		<t:checkbox t:id="southEast" t:value="entity.southEast"  class="element checkbox indent" /><t:label for="southEast" class="indent" />
+		<t:checkbox t:id="northCarolina" t:value="entity.northCarolina"  class="element checkbox indent2" /><t:label for="northCarolina" class="indent2" />
+		<t:checkbox t:id="southCarolina" t:value="entity.southCarolina"  class="element checkbox indent2" /><t:label for="southCarolina" class="indent2" />
+		<t:checkbox t:id="localCity" t:value="entity.localCity"  class="element checkbox" /><t:label for="localCity" class="choice" />
+		<t:checkbox t:id="problemFocused" t:value="entity.problemFocused"  class="element checkbox" /><t:label for="problemFocused" class="choice" />
+
+
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('sectorBox');" title="Show or Hide">Sector</legend>
+       <div id="sectorBox" class="unhidden">
+
+		<t:checkbox t:id="publicHealth" t:value="entity.publicHealth"  class="element checkbox" /><t:label for="publicHealth" class="choice" />
+		<t:checkbox t:id="emergencyManagement" t:value="entity.emergencyManagement"  class="element checkbox indent" /><t:label for="emergencyManagement" class="indent" />
+		<t:checkbox t:id="indirectClimateHazards" t:value="entity.indirectClimateHazards"  class="element checkbox indent" /><t:label for="indirectClimateHazards" class="indent" />
+		<t:checkbox t:id="vectorBorneIllness" t:value="entity.vectorBorneIllness"  class="element checkbox indent" /><t:label for="vectorBorneIllness" class="indent" />
+		<t:checkbox t:id="heatRelated" t:value="entity.heatRelated"  class="element checkbox indent" /><t:label for="heatRelated" class="indent" />
+		<t:checkbox t:id="waterQuality" t:value="entity.waterQuality"  class="element checkbox indent" /><t:label for="waterQuality" class="indent" />
+		<t:checkbox t:id="infrastructure" t:value="entity.infrastructure"  class="element checkbox" /><t:label for="infrastructure" class="choice" />
+		<t:checkbox t:id="energy" t:value="entity.energy"  class="element checkbox indent" /><t:label for="energy" class="indent" />
+		<t:checkbox t:id="communication" t:value="entity.communication"  class="element checkbox indent" /><t:label for="communication" class="indent" />
+		<t:checkbox t:id="freshWaterResources" t:value="entity.freshWaterResources"  class="element checkbox indent" /><t:label for="freshWaterResources" class="indent" />
+		<t:checkbox t:id="stormWater" t:value="entity.stormWater"  class="element checkbox indent2" /><t:label for="stormWater" class="indent2" />
+		<t:checkbox t:id="wastewater" t:value="entity.wastewater"  class="element checkbox indent2" /><t:label for="wastewater" class="indent2" />
+		<t:checkbox t:id="waterSupply" t:value="entity.waterSupply"  class="element checkbox indent2" /><t:label for="waterSupply" class="indent2" />
+		<t:checkbox t:id="transportation" t:value="entity.transportation"  class="element checkbox indent" /><t:label for="transportation" class="indent" />
+		<t:checkbox t:id="builtCoast" t:value="entity.builtCoast"  class="element checkbox indent" /><t:label for="builtCoast" class="indent" />
+		<t:checkbox t:id="managedEcosystems" t:value="entity.managedEcosystems"  class="element checkbox" /><t:label for="managedEcosystems" class="choice" />
+		<t:checkbox t:id="fisheries" t:value="entity.fisheries"  class="element checkbox indent" /><t:label for="fisheries" class="indent" />
+		<t:checkbox t:id="aquaculture" t:value="entity.aquaculture"  class="element checkbox indent" /><t:label for="aquaculture" class="indent" />
+		<t:checkbox t:id="agriculture" t:value="entity.agriculture"  class="element checkbox indent" /><t:label for="agriculture" class="indent" />
+		<t:checkbox t:id="forests" t:value="entity.forests"  class="element checkbox indent" /><t:label for="forests" class="indent" />
+		<t:checkbox t:id="otherManagedEcosystems" t:value="entity.otherManagedEcosystems"  class="element checkbox indent" /><t:label for="otherManagedEcosystems" class="indent" />
+		<t:checkbox t:id="naturalEcosystems" t:value="entity.naturalEcosystems"  class="element checkbox" /><t:label for="naturalEcosystems" class="choice" />
+		<t:checkbox t:id="coasts" t:value="entity.coasts"  class="element checkbox indent" /><t:label for="coasts" class="indent" />
+		<t:checkbox t:id="estuaries" t:value="entity.estuaries"  class="element checkbox indent" /><t:label for="estuaries" class="indent" />
+		<t:checkbox t:id="wetlands" t:value="entity.wetlands"  class="element checkbox indent" /><t:label for="wetlands" class="indent" />
+		<t:checkbox t:id="oceans" t:value="entity.oceans"  class="element checkbox indent" /><t:label for="oceans" class="indent" />
+		<t:checkbox t:id="inland" t:value="entity.inland"  class="element checkbox indent" /><t:label for="inland" class="indent" />
+		<t:checkbox t:id="beaches" t:value="entity.beaches"  class="element checkbox indent" /><t:label for="beaches" class="indent" />
+		<t:checkbox t:id="biota" t:value="entity.biota"  class="element checkbox" /><t:label for="biota" class="choice" />
+		<t:checkbox t:id="marine" t:value="entity.marine"  class="element checkbox indent" /><t:label for="marine" class="indent" />
+		<t:checkbox t:id="terrestrial" t:value="entity.terrestrial"  class="element checkbox indent" /><t:label for="terrestrial" class="indent" />
+		<t:checkbox t:id="endangered" t:value="entity.endangered"  class="element checkbox indent" /><t:label for="endangered" class="indent" />
+		<t:checkbox t:id="candidateSpecies" t:value="entity.candidateSpecies"  class="element checkbox indent" /><t:label for="candidateSpecies" class="indent" />
+		<t:checkbox t:id="concernSpecies" t:value="entity.concernSpecies"  class="element checkbox indent" /><t:label for="concernSpecies" class="indent" />
+		<t:checkbox t:id="cultural" t:value="entity.cultural"  class="element checkbox" /><t:label for="cultural" class="choice" />
+		<t:checkbox t:id="recreationAndTourism" t:value="entity.recreationAndTourism"  class="element checkbox" /><t:label for="recreationAndTourism" class="choice" />
+		<t:checkbox t:id="urban" t:value="entity.urban"  class="element checkbox indent" /><t:label for="urban" class="indent" />
+		<t:checkbox t:id="indigenousPeoples" t:value="entity.indigenousPeoples"  class="element checkbox indent" /><t:label for="indigenousPeoples" class="indent" />
+		<t:checkbox t:id="minority" t:value="entity.minority"  class="element checkbox indent" /><t:label for="minority" class="indent" />
+		<t:checkbox t:id="economicResources" t:value="entity.economicResources"  class="element checkbox" /><t:label for="economicResources" class="choice" />
+		<t:checkbox t:id="crossDisciplinary" t:value="entity.crossDisciplinary"  class="element checkbox" /><t:label for="crossDisciplinary" class="choice" />
+		<t:checkbox t:id="otherSector" t:value="entity.otherSector"  class="element checkbox" /><t:label for="otherSector" class="choice" />
+		
+
+
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+		
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('capabilitiesBox');" title="Show or Hide">Capability Area</legend>
+       <div id="capabilitiesBox" class="unhidden">
+		
+		<t:checkbox t:id="ecv" t:value="entity.ecv"  class="element checkbox" /><t:label for="ecv" class="choice" />
+		<t:checkbox t:id="impacts" t:value="entity.impacts"  class="element checkbox" /><t:label for="impacts" class="choice" />
+		<t:checkbox t:id="vulnerabilityAssessments" t:value="entity.vulnerabilityAssessments"  class="element checkbox indent" /><t:label for="vulnerabilityAssessments" class="indent" />
+		<t:checkbox t:id="riskAssessments" t:value="entity.riskAssessments"  class="element checkbox indent" /><t:label for="riskAssessments" class="indent" />
+		<t:checkbox t:id="needs" t:value="entity.needs"  class="element checkbox indent" /><t:label for="needs" class="indent" />
+		<t:checkbox t:id="scenarioPlanning" t:value="entity.scenarioPlanning"  class="element checkbox indent" /><t:label for="scenarioPlanning" class="indent" />
+		<t:checkbox t:id="experimentalImpacts" t:value="entity.experimentalImpacts"  class="element checkbox indent" /><t:label for="experimentalImpacts" class="indent" />
+		<t:checkbox t:id="monitor" t:value="entity.monitor"  class="element checkbox indent" /><t:label for="monitor" class="indent" />
+		<t:checkbox t:id="downscale" t:value="entity.downscale"  class="element checkbox indent" /><t:label for="downscale" class="indent" />
+		<t:checkbox t:id="conditions" t:value="entity.conditions"  class="element checkbox indent" /><t:label for="conditions" class="indent" />
+		<t:checkbox t:id="forecastImpacts" t:value="entity.forecastImpacts"  class="element checkbox indent" /><t:label for="forecastImpacts" class="indent" />
+		<t:checkbox t:id="economicImpacts" t:value="entity.economicImpacts"  class="element checkbox indent" /><t:label for="economicImpacts" class="indent" />
+		<t:checkbox t:id="publicSecurity" t:value="entity.publicSecurity"  class="element checkbox indent" /><t:label for="publicSecurity" class="indent" />
+		<t:checkbox t:id="mitigation" t:value="entity.mitigation"  class="element checkbox" /><t:label for="mitigation" class="choice" />
+		<t:checkbox t:id="translation" t:value="entity.translation"  class="element checkbox indent" /><t:label for="translation" class="indent" />
+		<t:checkbox t:id="tools" t:value="entity.tools"  class="element checkbox indent" /><t:label for="tools" class="indent" />
+		<t:checkbox t:id="stakeholder" t:value="entity.stakeholder"  class="element checkbox indent" /><t:label for="stakeholder" class="indent" />
+		<t:checkbox t:id="guidance" t:value="entity.guidance"  class="element checkbox indent" /><t:label for="guidance" class="indent" />
+		<t:checkbox t:id="literacy" t:value="entity.literacy"  class="element checkbox" /><t:label for="literacy" class="choice" />
+		<t:checkbox t:id="translate" t:value="entity.translate"  class="element checkbox indent" /><t:label for="translate" class="indent" />
+		<t:checkbox t:id="improve" t:value="entity.improve"  class="element checkbox indent" /><t:label for="improve" class="indent" />
+		
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+		
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('disciplineBox');" title="Show or Hide">Scientific Discipline</legend>
+       <div id="disciplineBox" class="unhidden">
+				
+		<t:checkbox t:id="physical" t:value="entity.physical"  class="element checkbox" /><t:label for="physical" class="choice" />
+		<t:checkbox t:id="atmospheric" t:value="entity.atmospheric"  class="element checkbox indent" /><t:label for="atmospheric" class="indent" />
+		<t:checkbox t:id="surfaceAtmosphere" t:value="entity.surfaceAtmosphere"  class="element checkbox indent2" /><t:label for="surfaceAtmosphere" class="indent2" />
+		<t:checkbox t:id="upperAir" t:value="entity.upperAir"  class="element checkbox indent2" /><t:label for="upperAir" class="indent2" />
+		<t:checkbox t:id="composition" t:value="entity.composition"  class="element checkbox indent2" /><t:label for="composition" class="indent2" />
+		<t:checkbox t:id="coastalAndOceanic" t:value="entity.coastalAndOceanic"  class="element checkbox indent" /><t:label for="coastalAndOceanic" class="indent" />
+		<t:checkbox t:id="surface" t:value="entity.surface"  class="element checkbox indent2" /><t:label for="surface" class="indent2" />
+		<t:checkbox t:id="subSurface" t:value="entity.subSurface"  class="element checkbox indent2" /><t:label for="subSurface" class="indent2" />
+		<t:checkbox t:id="ground" t:value="entity.ground"  class="element checkbox indent" /><t:label for="ground" class="indent" />
+		<t:checkbox t:id="ecologicalAndBiological" t:value="entity.ecologicalAndBiological"  class="element checkbox" /><t:label for="ecologicalAndBiological" class="choice" />
+		<t:checkbox t:id="population" t:value="entity.population"  class="element checkbox indent" /><t:label for="population" class="indent" />
+		<t:checkbox t:id="ecosystem" t:value="entity.ecosystem"  class="element checkbox indent" /><t:label for="ecosystem" class="indent" />
+		<t:checkbox t:id="organism" t:value="entity.organism"  class="element checkbox indent" /><t:label for="organism" class="indent" />
+		<t:checkbox t:id="microbial" t:value="entity.microbial"  class="element checkbox indent" /><t:label for="microbial" class="indent" />
+		<t:checkbox t:id="otherBiologicalOrEcological" t:value="entity.otherBiologicalOrEcological"  class="element checkbox indent" /><t:label for="otherBiologicalOrEcological" class="indent" />
+		<t:checkbox t:id="geological" t:value="entity.geological"  class="element checkbox" /><t:label for="geological" class="choice" />
+		<t:checkbox t:id="paleoClimate" t:value="entity.paleoClimate"  class="element checkbox indent" /><t:label for="paleoClimate" class="indent" />
+		<t:checkbox t:id="pollenCounting" t:value="entity.pollenCounting"  class="element checkbox indent" /><t:label for="pollenCounting" class="indent" />
+		<t:checkbox t:id="porosity" t:value="entity.porosity"  class="element checkbox indent" /><t:label for="porosity" class="indent" />
+		<t:checkbox t:id="otherGeological" t:value="entity.otherGeological"  class="element checkbox indent" /><t:label for="otherGeological" class="indent" />
+		<t:checkbox t:id="chemical" t:value="entity.chemical"  class="element checkbox" /><t:label for="chemical" class="choice" />
+		<t:checkbox t:id="ph" t:value="entity.ph"  class="element checkbox indent" /><t:label for="ph" class="indent" />
+		<t:checkbox t:id="carbonConcentration" t:value="entity.carbonConcentration"  class="element checkbox indent" /><t:label for="carbonConcentration" class="indent" />
+		<t:checkbox t:id="otherChemical" t:value="entity.otherChemical"  class="element checkbox indent" /><t:label for="otherChemical" class="indent" />
+		<t:checkbox t:id="climateSocietyInteractions" t:value="entity.climateSocietyInteractions"  class="element checkbox" /><t:label for="climateSocietyInteractions" class="choice" />
+		<t:checkbox t:id="socialAndEconomic" t:value="entity.socialAndEconomic"  class="element checkbox indent" /><t:label for="socialAndEconomic" class="indent" />
+		<t:checkbox t:id="decisionMaking" t:value="entity.decisionMaking"  class="element checkbox indent" /><t:label for="decisionMaking" class="indent" />
+		<t:checkbox t:id="riskAssessmentOrRiskManagement" t:value="entity.riskAssessmentOrRiskManagement"  class="element checkbox indent" /><t:label for="riskAssessmentOrRiskManagement" class="indent" />
+		<t:checkbox t:id="policyPlanning" t:value="entity.policyPlanning"  class="element checkbox indent" /><t:label for="policyPlanning" class="indent" />
+		<t:checkbox t:id="communicationAndEducation" t:value="entity.communicationAndEducation"  class="element checkbox indent" /><t:label for="communicationAndEducation" class="indent" />
+		<t:checkbox t:id="otherClimateSocietyInteractions" t:value="entity.otherClimateSocietyInteractions"  class="element checkbox indent" /><t:label for="otherClimateSocietyInteractions" class="indent" />
+		
+       </div>
+       
+      </fieldset>
+     </li>
+	
+		
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('dataBox');" title="Show or Hide">Data</legend>
+       <div id="dataBox" class="unhidden">
+						
+		<t:checkbox t:id="insituObservations" t:value="entity.insituObservations"  class="element checkbox" /><t:label for="insituObservations" class="choice" />
+		<t:checkbox t:id="satelliteRemoteObservations" t:value="entity.satelliteRemoteObservations"  class="element checkbox" /><t:label for="satelliteRemoteObservations" class="choice" />
+		<t:checkbox t:id="observingSystems" t:value="entity.observingSystems"  class="element checkbox" /><t:label for="observingSystems" class="choice" />
+		<t:checkbox t:id="surveysAndPreliminaryAssessments" t:value="entity.surveysAndPreliminaryAssessments"  class="element checkbox" /><t:label for="surveysAndPreliminaryAssessments" class="choice" />
+		<t:checkbox t:id="indicatorBasedResearch" t:value="entity.indicatorBasedResearch"  class="element checkbox" /><t:label for="indicatorBasedResearch" class="choice" />
+		<t:checkbox t:id="reanalysisProducts" t:value="entity.reanalysisProducts"  class="element checkbox" /><t:label for="reanalysisProducts" class="choice" />
+		<t:checkbox t:id="depthAndElevationData" t:value="entity.depthAndElevationData"  class="element checkbox" /><t:label for="depthAndElevationData" class="choice" />
+		<t:checkbox t:id="dataStewardshipAndProvisions" t:value="entity.dataStewardshipAndProvisions"  class="element checkbox" /><t:label for="dataStewardshipAndProvisions" class="choice" />
+		<t:checkbox t:id="otherData" t:value="entity.otherData"  class="element checkbox" /><t:label for="otherData" class="choice" />
+		
+       </div>
+       
+      </fieldset>
+     </li>
+	
+	
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('productsBox');" title="Show or Hide">Products</legend>
+       <div id="productsBox" class="unhidden">
+       
+		<t:checkbox t:id="hindcasts" t:value="entity.hindcasts"  class="element checkbox" /><t:label for="hindcasts" class="choice" />
+		<t:checkbox t:id="forecastsAndOutlooks" t:value="entity.forecastsAndOutlooks"  class="element checkbox" /><t:label for="forecastsAndOutlooks" class="choice" />
+		<t:checkbox t:id="projections" t:value="entity.projections"  class="element checkbox" /><t:label for="projections" class="choice" />
+		<t:checkbox t:id="maps" t:value="entity.maps"  class="element checkbox" /><t:label for="maps" class="choice" />
+		<t:checkbox t:id="assessments" t:value="entity.assessments"  class="element checkbox" /><t:label for="assessments" class="choice" />
+		<t:checkbox t:id="adaptationPlan" t:value="entity.adaptationPlan"  class="element checkbox indent" /><t:label for="adaptationPlan" class="indent" />
+		<t:checkbox t:id="needsAssessment" t:value="entity.needsAssessment"  class="element checkbox indent" /><t:label for="needsAssessment" class="indent" />
+		<t:checkbox t:id="productCapacity" t:value="entity.productCapacity"  class="element checkbox indent2" /><t:label for="productCapacity" class="indent2" />
+		<t:checkbox t:id="productCapabilities" t:value="entity.productCapabilities"  class="element checkbox indent2" /><t:label for="productCapabilities" class="indent2" />
+		<t:checkbox t:id="actionPlan" t:value="entity.actionPlan"  class="element checkbox indent" /><t:label for="actionPlan" class="indent" />
+		<t:checkbox t:id="needsActions" t:value="entity.needsActions"  class="element checkbox indent2" /><t:label for="needsActions" class="indent2" />
+		<t:checkbox t:id="capacity" t:value="entity.capacity"  class="element checkbox indent2" /><t:label for="capacity" class="indent2" />
+		<t:checkbox t:id="capabilities" t:value="entity.capabilities"  class="element checkbox indent2" /><t:label for="capabilities" class="indent2" />
+		<t:checkbox t:id="impactStudy" t:value="entity.impactStudy"  class="element checkbox indent" /><t:label for="impactStudy" class="indent" />
+		<t:checkbox t:id="riskAndVulnerability" t:value="entity.riskAndVulnerability"  class="element checkbox indent" /><t:label for="riskAndVulnerability" class="indent" />
+		<t:checkbox t:id="problemFocusedProduct" t:value="entity.problemFocusedProduct"  class="element checkbox indent" /><t:label for="problemFocusedProduct" class="indent" />
+		<t:checkbox t:id="climateScience" t:value="entity.climateScience"  class="element checkbox indent2" /><t:label for="climateScience" class="indent2" />
+		<t:checkbox t:id="otherProducts" t:value="entity.otherProducts"  class="element checkbox" /><t:label for="otherProducts" class="choice" />
+
+       </div>
+       
+      </fieldset>
+     </li>
+	
+	
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('servicesBox');" title="Show or Hide">Services</legend>
+       <div id="servicesBox" class="unhidden">
+	
+		<t:checkbox t:id="engagement" t:value="entity.engagement"  class="element checkbox" /><t:label for="engagement" class="choice" />
+		<t:checkbox t:id="stakeholderEngagement" t:value="entity.stakeholderEngagement"  class="element checkbox indent" /><t:label for="stakeholderEngagement" class="indent" />
+		<t:checkbox t:id="sectorSpecific" t:value="entity.sectorSpecific"  class="element checkbox indent2" /><t:label for="sectorSpecific" class="indent2" />
+		<t:checkbox t:id="regionSpecific" t:value="entity.regionSpecific"  class="element checkbox indent2" /><t:label for="regionSpecific" class="indent2" />
+		<t:checkbox t:id="publicEngagement" t:value="entity.publicEngagement"  class="element checkbox indent" /><t:label for="publicEngagement" class="indent" />
+		<t:checkbox t:id="education" t:value="entity.education"  class="element checkbox" /><t:label for="education" class="choice" />
+		<t:checkbox t:id="k12Education" t:value="entity.k12Education"  class="element checkbox indent" /><t:label for="k12Education" class="indent" />
+		<t:checkbox t:id="publicEducation" t:value="entity.publicEducation"  class="element checkbox indent" /><t:label for="publicEducation" class="indent" />
+		<t:checkbox t:id="trainingAndCapacityBuilding" t:value="entity.trainingAndCapacityBuilding"  class="element checkbox" /><t:label for="trainingAndCapacityBuilding" class="choice" />
+		<t:checkbox t:id="dataSupportTools" t:value="entity.dataSupportTools"  class="element checkbox indent" /><t:label for="dataSupportTools" class="indent" />
+		<t:checkbox t:id="adaptationAndMitigationGuidance" t:value="entity.adaptationAndMitigationGuidance"  class="element checkbox indent" /><t:label for="adaptationAndMitigationGuidance" class="indent" />
+		<t:checkbox t:id="viewersAndWebBasedTools" t:value="entity.viewersAndWebBasedTools"  class="element checkbox" /><t:label for="viewersAndWebBasedTools" class="choice" />
+		<t:checkbox t:id="monitoringTools" t:value="entity.monitoringTools"  class="element checkbox indent" /><t:label for="monitoringTools" class="indent" />
+		<t:checkbox t:id="visualizationTools" t:value="entity.visualizationTools"  class="element checkbox indent" /><t:label for="visualizationTools" class="indent" />
+		<t:checkbox t:id="prioritizationTools" t:value="entity.prioritizationTools"  class="element checkbox indent" /><t:label for="prioritizationTools" class="indent" />
+		<t:checkbox t:id="managementGuidance" t:value="entity.managementGuidance"  class="element checkbox" /><t:label for="managementGuidance" class="choice" />
+		<t:checkbox t:id="policyGuidance" t:value="entity.policyGuidance"  class="element checkbox" /><t:label for="policyGuidance" class="choice" />
+		<t:checkbox t:id="otherServices" t:value="entity.otherServices"  class="element checkbox" /><t:label for="otherServices" class="choice" />
+
+
+       </div>
+       
+      </fieldset>
+     </li>
+	
+
+
+    <t:body/>
+
+   </ul>
+  </t:form>	
+    
  </body>
 </html>
