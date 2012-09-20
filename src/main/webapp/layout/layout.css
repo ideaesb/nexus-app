@@ -377,7 +377,7 @@ img
 	height: 500px; /*27*/
 	margin: 0 auto; /* the auto margins (in conjunction with a width) center the page */
 	text-align: left; /* this overrides the text-align: center on the body element. */
-	padding-top: 10px;
+	padding-top: 0px;
 	float:left;
 	margin-bottom:20px;
 } 
@@ -393,10 +393,10 @@ img
 } 
 #searchContainer{
 	width:750px;
-	margin: 10px auto; /* the auto margins (in conjunction with a width) center the page */
+	margin: 0px auto; /* the auto margins (in conjunction with a width) center the page */
 	/*border:1px solid black;*/
 	float:left;
-	padding-bottom:10px;
+	padding-bottom:0px;
 }
 
 

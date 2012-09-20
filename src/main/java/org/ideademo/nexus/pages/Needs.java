@@ -57,6 +57,13 @@ public class Needs
   
   @Inject
   private HibernateSessionManager sessionManager;
+  
+  @Property 
+  @Persist (PersistenceConstants.FLASH)
+  int retrieved; 
+  @Property 
+  @Persist (PersistenceConstants.FLASH)
+  int total;
 
   
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,6 +550,10 @@ public class Needs
 	if (discipline != null) onValueChangedFromDiscipline(discipline.toString());
 	if (sector != null) onValueChangedFromSector(sector.toString());
 	if (regions != null) onValueChangedFromRegions(regions.toString());
+
+	// Get all records anyway
+	List <Need> alst = session.createCriteria(Need.class).list();
+    total = alst.size();
 	
 	// then makes lists and sublists as per the search criteria 
 	List<Need> xlst=null;
@@ -601,8 +612,6 @@ public class Needs
     // organize what type of list is returned...either total, partial (subset) or intersection of various search results  
     if (example == null && (searchText == null || searchText.trim().length() == 0))
     {
-    	// Everything...
-    	List <Need> alst = session.createCriteria(Need.class).list();
     	if (alst != null && alst.size() > 0)
     	{
     		logger.info ("Returing all " + alst.size() + " Need records");
@@ -612,18 +621,21 @@ public class Needs
     	{
     		logger.warn("No Need records found in the database");
     	}
-        return alst;
+    	retrieved = total;
+    	return alst;
     }
     else if (xlst == null && tlst != null)
     {
     	// just text search results
     	logger.info("Returing " + tlst.size() + " Need records from PURE text search for " + searchText);
+    	retrieved = tlst.size();
     	return tlst;
     }
     else if (xlst != null && tlst == null)
     {
     	// just example query results
     	logger.info("Returning " + xlst.size() + " Need records from PURE Query-By-Example (QBE)");
+    	retrieved = xlst.size();
     	return xlst;
     }
     else 
@@ -631,13 +643,25 @@ public class Needs
     	// get the intersection of the two lists
     	
     	// if one of them is empty, return the other
-    	if (xlst.size() == 0 && tlst.size() > 0) return tlst;
-    	if (tlst.size() == 0 && xlst.size() > 0) return xlst;
-    	
+    	if (xlst.size() == 0 && tlst.size() > 0)
+    	{
+        	retrieved = tlst.size();
+    		return tlst;
+    	}
+
+    	if (tlst.size() == 0 && xlst.size() > 0)
+    	{
+        	retrieved = xlst.size();
+	        return xlst;
+    	}
     	
     	List <Need> ivec = new Vector<Need>();
     	// if both are empty, return this vector. 
-    	if (xlst.size() == 0 && tlst.size() == 0) return ivec; 
+    	if (xlst.size() == 0 && tlst.size() == 0)
+    	{
+        	retrieved = 0;
+    		return ivec;
+    	}
     	
     	// now deal with BOTH text and QBE being non-empty lists - by Id
     	Iterator<Need> xiterator = xlst.iterator();
@@ -662,6 +686,7 @@ public class Needs
     	}
     	if (ivec.size() > 0)  Collections.sort(ivec);
     	logger.info("Returning " + ivec.size() + " Need records from COMBINED (text, QBE) Search");
+    	retrieved = ivec.size();
     	return ivec;
     }
     
