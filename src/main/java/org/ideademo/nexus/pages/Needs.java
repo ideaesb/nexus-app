@@ -3,12 +3,15 @@ package org.ideademo.nexus.pages;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.tapestry5.PersistenceConstants;
 
+import org.apache.tapestry5.annotations.PageActivationContext;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.Persist;
+
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
 
@@ -22,7 +25,11 @@ import org.hibernate.criterion.MatchMode;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+
+import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.dsl.TermMatchingContext;
+
 
 import org.ideademo.nexus.entities.Need;
 
@@ -551,12 +558,13 @@ public class Needs
 	if (sector != null) onValueChangedFromSector(sector.toString());
 	if (regions != null) onValueChangedFromRegions(regions.toString());
 
-	// Get all records anyway
-	List <Need> alst = session.createCriteria(Need.class).list();
+    // Get all records anyway - for showing total at bottom of presentation layer
+    List <Need> alst = session.createCriteria(Need.class).list();
     total = alst.size();
+
 	
-	// then makes lists and sublists as per the search criteria 
-	List<Need> xlst=null;
+    // then makes lists and sublists as per the search criteria 
+    List<Need> xlst=null; // xlst = Query by Example search List
     if(example != null)
     {
        Example ex = Example.create(example).excludeFalse().ignoreCase().enableLike(MatchMode.ANYWHERE);
@@ -578,28 +586,36 @@ public class Needs
     List<Need> tlst=null;
     if (searchText != null && searchText.trim().length() > 0)
     {
-      logger.info("Searching for Text = " + searchText + "  in Need database table.");
       FullTextSession fullTextSession = Search.getFullTextSession(sessionManager.getSession());  
       try
       {
         fullTextSession.createIndexer().startAndWait();
-      }
-      catch (java.lang.InterruptedException e)
-      {
-        logger.warn("Lucene Indexing had some problem in creating indexer for full text session Start/Wait" + e);
-      }
+       }
+       catch (java.lang.InterruptedException e)
+       {
+         logger.warn("Lucene Indexing was interrupted by something " + e);
+       }
       
        QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Need.class ).get();
-       org.apache.lucene.search.Query luceneQuery = qb
-			    .keyword()
-			    .onFields("code","name","description", "keywords","contact", "url", "objectives", "worksheet", "source", "requestor", "feedback", "data", "products", "services", "programs", "projects", "comments")
-			    .matching(searchText)
-			    .createQuery();
-      	  
+       
+       // fields being covered by text search 
+       TermMatchingContext onFields = qb
+		        .keyword()
+		        .onFields("code","name","description", "keywords","contact", "url", "objectives", "worksheet", "source", "requestor", "feedback", "data", "products", "services", "programs", "projects", "comments");
+       
+       BooleanJunction<BooleanJunction> bool = qb.bool();
+       /////// Tokenize the search string for default AND logic ///
+       StringTokenizer st = new StringTokenizer(searchText);
+       while (st.hasMoreElements()) {
+    	   bool.must(onFields.matching(st.nextElement()).createQuery());
+       }
+       
+       org.apache.lucene.search.Query luceneQuery = bool.createQuery();
+       
        tlst = fullTextSession.createFullTextQuery(luceneQuery, Need.class).list();
        if (tlst != null) 
        {
-    	   logger.info("TEXT Search for " + searchText + " found " + tlst.size() + " Need records in database");
+    	   logger.info("TEXT Search for " + searchText + " found " + tlst.size() + " Needs records in database");
     	   Collections.sort(tlst);
        }
        else
@@ -612,9 +628,10 @@ public class Needs
     // organize what type of list is returned...either total, partial (subset) or intersection of various search results  
     if (example == null && (searchText == null || searchText.trim().length() == 0))
     {
+    	// Everything...
     	if (alst != null && alst.size() > 0)
     	{
-    		logger.info ("Returing all " + alst.size() + " Need records");
+    		logger.info ("Returing all " + alst.size() + " Needs records");
         	Collections.sort(alst);
     	}
     	else
@@ -622,48 +639,58 @@ public class Needs
     		logger.warn("No Need records found in the database");
     	}
     	retrieved = total;
-    	return alst;
+        return alst; 
     }
     else if (xlst == null && tlst != null)
     {
     	// just text search results
-    	logger.info("Returing " + tlst.size() + " Need records from PURE text search for " + searchText);
+    	logger.info("Returing " + tlst.size() + " Needs records as a result of PURE text search (no QBE) for " + searchText);
     	retrieved = tlst.size();
     	return tlst;
     }
     else if (xlst != null && tlst == null)
     {
     	// just example query results
-    	logger.info("Returning " + xlst.size() + " Need records from PURE Query-By-Example (QBE)");
+    	logger.info("Returning " + xlst.size() + " Needs records as a result of PURE Query-By-Example (QBE), no text string");
     	retrieved = xlst.size();
     	return xlst;
     }
     else 
     {
-    	// get the intersection of the two lists
+
+        ////////////////////////////////////////////
+    	// get the INTERSECTION of the two lists
     	
+    	// TRIVIAL: if one of them is empty, return the other
     	// if one of them is empty, return the other
     	if (xlst.size() == 0 && tlst.size() > 0)
     	{
+        	logger.info("Returing " + tlst.size() + " Needs records as a result of ONLY text search, QBE pulled up ZERO records for " + searchText);
         	retrieved = tlst.size();
     		return tlst;
     	}
 
     	if (tlst.size() == 0 && xlst.size() > 0)
     	{
+        	logger.info("Returning " + xlst.size() + " Needs records as a result of ONLY Query-By-Example (QBE), text search pulled up NOTHING for string " + searchText);
         	retrieved = xlst.size();
 	        return xlst;
     	}
     	
+    	
     	List <Need> ivec = new Vector<Need>();
-    	// if both are empty, return this vector. 
+    	// if both are empty, return this Empty vector. 
     	if (xlst.size() == 0 && tlst.size() == 0)
     	{
+        	logger.info("Neither QBE nor text search for string " + searchText +  " pulled up ANY Needs Records.");
         	retrieved = 0;
     		return ivec;
     	}
     	
-    	// now deal with BOTH text and QBE being non-empty lists - by Id
+
+
+    	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    	// now deal with BOTH text and QBE being non-empty lists - implementing intersection by Database Primary Key -  Id
     	Iterator<Need> xiterator = xlst.iterator();
     	while (xiterator.hasNext()) 
     	{
@@ -684,8 +711,9 @@ public class Needs
     		}
     			
     	}
+    	// sort again - 
     	if (ivec.size() > 0)  Collections.sort(ivec);
-    	logger.info("Returning " + ivec.size() + " Need records from COMBINED (text, QBE) Search");
+    	logger.info("Returning " + ivec.size() + " Needs records from COMBINED (text, QBE) Search");
     	retrieved = ivec.size();
     	return ivec;
     }
