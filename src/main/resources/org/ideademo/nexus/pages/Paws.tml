@@ -1,0 +1,198 @@
+<html t:type="layout" title="needs"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+ 
+<body id="bg2">
+    <ul id="nav">
+     <li><a href="../index.php"><span>Home</span></a></li>
+     <li><a href="../nexus/needs" title="Needs"><span>Needs</span></a></li>
+     <li><a href="../nexus/daps" title="Data, Products &amp; Services"><span>Data, Products &amp; Services</span></a></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Projects &amp; Activities</u></t:pagelink></li>
+     <li><a href="javascript:alert('Under Construction');" title="Partners &amp; Programs"><span>Partners &amp; Programs</span></a></li>
+     <li><a href="javascript:alert('Under Construction');" title="Bibliography"><span>Bibliography</span></a></li>
+    </ul>
+    
+
+    <div id = "bodyContainer"> 
+		<div id ="searchContainer">
+		
+		 <form t:type="form" t:id="searchCriteria" action="needs" method="post">
+		   <table width="750">
+		   <tr>
+		      <td width="245">
+		        <t:label for="category"/>:<br />
+		        <t:select t:id="category" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="sector"/>:<br />
+		        <t:select t:id="sector" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      <td width="245">
+		        <t:label for="regions"/>:<br />
+		        <t:select t:id="regions" blankOption="ALWAYS" t:blankLabel="All"    
+		                  onchange="this.form.submit()" width="245" style="width:245px;font-size:11px;overflow: auto;" />
+		      </td>
+		      </tr>
+		    </table>
+		   
+		
+		    <table width="750" style="border-collapse: collapse; border-spacing: 0;">
+		     <tr class="title-blue" border="1">
+		        <td  align="right" width="150">Search</td>
+		        <td align="left">
+                   <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
+                   <t:submit t:id="search" value="Go" />
+                   <t:submit t:id="clear" value="Clear/Show All" />
+                   (<t:pagelink page="paw/search" target="_blank">Advanced</t:pagelink>)
+                 </td>
+		      </tr>
+		    </table>
+		   </form>
+		</div><!-- End of "searchContainer" -->
+    
+ <div id="container3"><!-- Contains the accordion. Allows for padding on the top of the accordion to fit and look better on page-->
+  <div id="container2"><!-- This contains the scroll css code. -->
+   <div id="Accordion1" class="Accordion" tabindex="0">
+
+
+   
+     <div class="AccordionPanel" t:type="Loop" t:source="list" t:value="row">
+      <div class="AccordionPanelTab">
+
+       <table class="project-box">
+        <colgroup>
+          <col class="title-blue" />
+        </colgroup>
+        <tr>
+         <td width="67" style="width: 67px">Name</td>
+         <td>${row.name}</td>
+        </tr>
+       </table>
+
+    </div><!-- End Accordion Panel Tab -->
+
+
+    <div class="AccordionPanelContent"><!--added by cameron-->
+
+    <table class="project-box">
+     <colgroup>
+      <col class="title-blue" />
+     </colgroup>
+     <tr>
+      <td>Description</td>
+      <td>${row.description}(<t:pagelink page="paw/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+     </tr>
+     
+          
+     <tr>
+      <td>Category</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.specific}"><li style="margin-left: 13px;">${message:SPECIFIC}</li></t:if> 
+        <t:if test="${row.retrofitted}"><li style="margin-left: 13px;">${message:RETRO}</li></t:if> 
+        <t:if test="${row.monitoring}"><li style="margin-left: 13px;">${message:MONITOR}</li></t:if> 
+        <t:if test="${row.research}"><li style="margin-left: 13px;">${message:RESEARCH}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+
+     <tr>
+      <td>Sector</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.publicHealth}"><li style="margin-left: 13px;">${message:PUBLIC}</li></t:if> 
+        <t:if test="${row.infrastructure}"><li style="margin-left: 13px;">${message:INFRA}</li></t:if> 
+        <t:if test="${row.managedEcosystems}"><li style="margin-left: 13px;">${message:MECO}</li></t:if> 
+        <t:if test="${row.naturalEcosystems}"><li style="margin-left: 13px;">${message:NECO}</li></t:if> 
+        <t:if test="${row.biota}"><li style="margin-left: 13px;">${message:BIOTA}</li></t:if> 
+        <t:if test="${row.cultural}"><li style="margin-left: 13px;">${message:CULT}</li></t:if> 
+        <t:if test="${row.economicResources}"><li style="margin-left: 13px;">${message:ECORES}</li></t:if> 
+        <t:if test="${row.recreationAndTourism}"><li style="margin-left: 13px;">${message:REC}</li></t:if> 
+        <t:if test="${row.crossDisciplinary}"><li style="margin-left: 13px;">${message:CROSS}</li></t:if> 
+        <t:if test="${row.otherSector}"><li style="margin-left: 13px;">${message:OSEC}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+
+     <tr>
+      <td>Focus Area</td>
+      <td>
+        <t:if test="${row.sustainability}"><img src="${context:layout/images/sustainability.jpg}" alt="${message:SUSTAINABILITY}" title="${message:SUSTAINABILITY}" /></t:if> 
+        <t:if test="${row.resilience}"><img src="${context:layout/images/resilience.jpg}" alt="${message:RESILIENCE}" title="${message:RESILIENCE}" /></t:if> 
+        <t:if test="${row.water}"><img src="${context:layout/images/water.jpg}" alt="${message:WATER}" title="${message:WATER}" /></t:if>
+        <t:if test="${row.extremes}"><img src="${context:layout/images/extremes.jpg}" alt="${message:EXTREMES}" title="${message:EXTREMES}" /></t:if> 
+        <t:if test="${row.conservation}"><img src="${context:layout/images/conservation.jpg}" alt="${message:CONSERVATION}" title="${message:CONSERVATION}" /></t:if>
+       </td>
+     </tr>
+     
+     <tr>
+      <td>Region</td>
+      <td>
+       <ul style="display: inline;margin-left: 0;padding-left: 0;">
+        <t:if test="${row.international}"><li style="margin-left: 13px;">${message:INT}</li></t:if> 
+        <t:if test="${row.national}"><li style="margin-left: 13px;">${message:NAT}</li></t:if> 
+        <t:if test="${row.regionalOrState}"><li style="margin-left: 13px;">${message:REG}</li></t:if> 
+        <t:if test="${row.localCity}"><li style="margin-left: 13px;">${message:LOC}</li></t:if> 
+        <t:if test="${row.problemFocused}"><li style="margin-left: 13px;">${message:OTH}</li></t:if> 
+        </ul>
+       </td>
+     </tr>
+
+     <tr>
+      <td>Status</td>
+      <td>
+        <t:if test="${row.ongoing}"><li style="margin-left: 13px;">Ongoing</li></t:if> 
+        <t:if test="${row.planned}"><li style="margin-left: 13px;">Planned</li></t:if> 
+        <t:if test="${row.proposed}"><li style="margin-left: 13px;">Proposed</li></t:if>
+        <t:if test="${row.completed}"><li style="margin-left: 13px;">Completed</li></t:if>
+       </td>
+     </tr>
+     
+     <tr>
+      <td>Timelines</td>
+      <td>${row.dates}</td>
+     </tr>
+
+     <tr>
+      <td>Resources</td>
+      <td>${row.resources}</td>
+     </tr>
+
+
+     <tr>
+      <td>Lead Agencies</td>
+      <td>${row.organization}</td>
+     </tr>
+
+     <tr>
+      <td>Contacts</td>
+      <td>${row.contact}</td>
+     </tr>
+
+
+    </table>
+
+        <!-- Column 1 end -->
+    </div><!-- End of AccordionPanelContent -->
+   </div><!-- End of AccordionPanel (both content and tab)  -->
+
+
+   </div><!-- End of Accordion 1 -->
+  </div><!-- End of "container 2" -->
+ </div><!-- End of "container 3" -->
+ <div style="float:right;width:280px;word-spacing:6px;font-size:80%;padding-right:10px;padding-top:2px;color:#888888;white-space:nowrap;text-align:right;">
+  ${retrieved} of ${total} records</div>
+
+  
+    
+    
+    </div><!--end of bodyContainer-->
+    
+<script type="text/javascript"><!--added by cameron-->
+var Accordion1 = new Spry.Widget.Accordion("Accordion1",{useFixedPanelHeights: false, defaultPanel: -1 });
+</script><!--(works only if loaded at end) -->
+
+</body>
+</html>

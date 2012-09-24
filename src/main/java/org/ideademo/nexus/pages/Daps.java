@@ -1,5 +1,4 @@
 package org.ideademo.nexus.pages;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -30,28 +29,28 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 
 
-import org.ideademo.nexus.entities.Need;
+import org.ideademo.nexus.entities.Dap;
 
 import org.apache.log4j.Logger;
 
 
-public class Needs 
+public class Daps 
 {
 	 
-  private static Logger logger = Logger.getLogger(Needs.class);
+  private static Logger logger = Logger.getLogger(Daps.class);
 
   
   /////////////////////////////
   //  Drives QBE Search
   @Persist (PersistenceConstants.FLASH)
-  private Need example;
+  private Dap example;
   
   
   //////////////////////////////
   // Used in rendering Grid Row
   @SuppressWarnings("unused")
   @Property 
-  private Need row;
+  private Dap row;
 
     
   @Property
@@ -217,13 +216,13 @@ public class Needs
   Object onValueChangedFromData(String choice)
   {	
     // if there is no example set, create one.
-    if (this.example == null)  this.example = new Need(); 
-	logger.info("Need/Data Choice = " + choice);
-	clearData(example);
+    if (this.example == null)  this.example = new Dap(); 
+    logger.info("Dap/Data Choice = " + choice);
+    clearData(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("INSITU"))
     {
       example.setInsituObservations(true);
@@ -262,12 +261,12 @@ public class Needs
     }
     else
     {
-   	  // do nothing
+      // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
 
   
@@ -276,17 +275,13 @@ public class Needs
   Object onValueChangedFromProducts(String choice)
   {	
     // if there is no example set, create one.
-    if (this.example == null) 
-    {
-      this.example = new Need(); 
-	}
-	logger.info("Products Choice = " + choice);
-	  
-	clearProducts(example);
+    if (this.example == null) this.example = new Dap(); 
+    logger.info("Products Choice = " + choice);
+    clearProducts(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("HIND"))
     {
       example.setHindcasts(true);
@@ -316,9 +311,9 @@ public class Needs
    	  // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
   
   
@@ -327,17 +322,13 @@ public class Needs
   Object onValueChangedFromServices(String choice)
   {	
     // if there is no example set, create one.
-    if (this.example == null) 
-    {
-      this.example = new Need(); 
-	}
-	logger.info("Services Choice = " + choice);
-	  
-	clearServices(example);
+    if (this.example == null) this.example = new Dap(); 
+    logger.info("Services Choice = " + choice);
+    clearServices(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("ENG"))
     {
       example.setEngagement(true);
@@ -366,14 +357,14 @@ public class Needs
     {
       example.setOtherServices(true);
     }
-   else
+    else
     {
-   	  // do nothing
+      // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
 
   //  Scientific Discipline Select Box Listener 
@@ -381,17 +372,13 @@ public class Needs
   Object onValueChangedFromDiscipline(String choice)
   {	
     // if there is no example set, create one.
-    if (this.example == null) 
-    {
-      this.example = new Need(); 
-	}
-	logger.info("Scientific Discipline Choice = " + choice);
-	  
-	clearDisciplines(example);
+    if (this.example == null) this.example = new Dap(); 
+    logger.info("Scientific Discipline Choice = " + choice);
+    clearDisciplines(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("PHY"))
     {
       example.setPhysical(true);
@@ -412,14 +399,14 @@ public class Needs
     {
       example.setSocialAndEconomic(true);
     }
-   else
+    else
     {
-   	  // do nothing
+      // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
 
   // sector select box listener
@@ -427,17 +414,13 @@ public class Needs
   Object onValueChangedFromSector(String choice)
   {	
     // no example? create one.
-    if (this.example == null) 
-    {
-      this.example = new Need(); 
-	}
-	logger.info("Sector Choice = " + choice);
-	  
-	clearSectors(example);
+    if (this.example == null) this.example = new Dap(); 
+    logger.info("Sector Choice = " + choice);
+    clearSectors(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("PUBLIC"))
     {
       example.setPublicHealth(true);
@@ -478,14 +461,14 @@ public class Needs
     {
       example.setOtherSector(true);
     }
-   else
+    else
     {
    	  // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
 
   
@@ -494,22 +477,13 @@ public class Needs
   Object onValueChangedFromRegions(String choice)
   {	
     // if there is no example set, create one.
-    if (this.example == null) 
-    {
-      logger.info("Region Select:  Example is NULL");
-      this.example = new Need(); 
-	}
-	else
-	{
-	  logger.info("Region Select:  Example is NOT null");
-    }
-	logger.info("Region Choice = " + choice);
-	  
-	clearRegions(example);
+    if (this.example == null) this.example = new Dap(); 
+    logger.info("Region Choice = " + choice);
+    clearRegions(example);
     if (choice == null)
-	{
+    {
       // clear 
-	}
+    }
     else if (choice.equalsIgnoreCase("INT"))
     {
       example.setInternational(true);
@@ -532,12 +506,12 @@ public class Needs
     }
    else
     {
-   	  // do nothing
+     // do nothing
     }
       
-  // return request.isXHR() ? editZone.getBody() : null;
-  // return index;
-   return null;
+    // return request.isXHR() ? editZone.getBody() : null;
+    // return index;
+    return null;
   }
 
   
@@ -546,43 +520,43 @@ public class Needs
   //
 
   @SuppressWarnings("unchecked")
-  public List<Need> getList()
+  public List<Dap> getList()
   {
 	
-	// first interpret search criteria 
-	if (data != null) onValueChangedFromData(data.toString());
-	if (products != null)  onValueChangedFromProducts(products.toString());
-	if (services != null) onValueChangedFromServices(services.toString());
-	if (discipline != null) onValueChangedFromDiscipline(discipline.toString());
-	if (sector != null) onValueChangedFromSector(sector.toString());
-	if (regions != null) onValueChangedFromRegions(regions.toString());
+   // first interpret search criteria 
+   if (data != null) onValueChangedFromData(data.toString());
+   if (products != null)  onValueChangedFromProducts(products.toString());
+   if (services != null) onValueChangedFromServices(services.toString());
+   if (discipline != null) onValueChangedFromDiscipline(discipline.toString());
+   if (sector != null) onValueChangedFromSector(sector.toString());
+   if (regions != null) onValueChangedFromRegions(regions.toString());
 
     // Get all records anyway - for showing total at bottom of presentation layer
-    List <Need> alst = session.createCriteria(Need.class).list();
+    List <Dap> alst = session.createCriteria(Dap.class).list();
     total = alst.size();
 
 	
     // then makes lists and sublists as per the search criteria 
-    List<Need> xlst=null; // xlst = Query by Example search List
+    List<Dap> xlst=null; // xlst = Query by Example search List
     if(example != null)
     {
        Example ex = Example.create(example).excludeFalse().ignoreCase().enableLike(MatchMode.ANYWHERE);
        
-       xlst = session.createCriteria(Need.class).add(ex).list();
+       xlst = session.createCriteria(Dap.class).add(ex).list();
        
        
        if (xlst != null)
        {
-    	   logger.info("Need Example Search Result List Size  = " + xlst.size() );
+    	   logger.info("Dap Example Search Result List Size  = " + xlst.size() );
     	   Collections.sort(xlst);
        }
        else
        {
-         logger.info("Need Example Search result did not find any results...");
+         logger.info("Dap Example Search result did not find any results...");
        }
     }
     
-    List<Need> tlst=null;
+    List<Dap> tlst=null;
     if (searchText != null && searchText.trim().length() > 0)
     {
       FullTextSession fullTextSession = Search.getFullTextSession(sessionManager.getSession());  
@@ -595,12 +569,12 @@ public class Needs
          logger.warn("Lucene Indexing was interrupted by something " + e);
        }
       
-       QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Need.class ).get();
+       QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Dap.class ).get();
        
        // fields being covered by text search 
        TermMatchingContext onFields = qb
 		        .keyword()
-		        .onFields("code","name","description", "keywords","contact", "url", "objectives", "worksheet", "source", "requestor", "feedback", "data", "products", "services", "programs", "projects", "comments");
+		        .onFields("code","name","description", "keywords","contact", "url", "objectives", "worksheet", "feedback");
        
        BooleanJunction<BooleanJunction> bool = qb.bool();
        /////// Tokenize the search string for default AND logic ///
@@ -611,15 +585,15 @@ public class Needs
        
        org.apache.lucene.search.Query luceneQuery = bool.createQuery();
        
-       tlst = fullTextSession.createFullTextQuery(luceneQuery, Need.class).list();
+       tlst = fullTextSession.createFullTextQuery(luceneQuery, Dap.class).list();
        if (tlst != null) 
        {
-    	   logger.info("TEXT Search for " + searchText + " found " + tlst.size() + " Needs records in database");
+    	   logger.info("TEXT Search for " + searchText + " found " + tlst.size() + " Daps records in database");
     	   Collections.sort(tlst);
        }
        else
        {
-          logger.info("TEXT Search for " + searchText + " found nothing in Needs");
+          logger.info("TEXT Search for " + searchText + " found nothing in Daps");
        }
     }
     
@@ -630,12 +604,12 @@ public class Needs
     	// Everything...
     	if (alst != null && alst.size() > 0)
     	{
-    		logger.info ("Returing all " + alst.size() + " Needs records");
-        	Collections.sort(alst);
+    	  logger.info ("Returing all " + alst.size() + " Daps records");
+          Collections.sort(alst);
     	}
     	else
     	{
-    		logger.warn("No Need records found in the database");
+    	  logger.warn("No Dap records found in the database");
     	}
     	retrieved = total;
         return alst; 
@@ -643,14 +617,14 @@ public class Needs
     else if (xlst == null && tlst != null)
     {
     	// just text search results
-    	logger.info("Returing " + tlst.size() + " Needs records as a result of PURE text search (no QBE) for " + searchText);
+    	logger.info("Returing " + tlst.size() + " Daps records as a result of PURE text search (no QBE) for " + searchText);
     	retrieved = tlst.size();
     	return tlst;
     }
     else if (xlst != null && tlst == null)
     {
     	// just example query results
-    	logger.info("Returning " + xlst.size() + " Needs records as a result of PURE Query-By-Example (QBE), no text string");
+    	logger.info("Returning " + xlst.size() + " Daps records as a result of PURE Query-By-Example (QBE), no text string");
     	retrieved = xlst.size();
     	return xlst;
     }
@@ -664,42 +638,42 @@ public class Needs
     	// if one of them is empty, return the other
     	if (xlst.size() == 0 && tlst.size() > 0)
     	{
-        	logger.info("Returing " + tlst.size() + " Needs records as a result of ONLY text search, QBE pulled up ZERO records for " + searchText);
+        	logger.info("Returing " + tlst.size() + " Daps records as a result of ONLY text search, QBE pulled up ZERO records for " + searchText);
         	retrieved = tlst.size();
     		return tlst;
     	}
 
     	if (tlst.size() == 0 && xlst.size() > 0)
     	{
-        	logger.info("Returning " + xlst.size() + " Needs records as a result of ONLY Query-By-Example (QBE), text search pulled up NOTHING for string " + searchText);
+        	logger.info("Returning " + xlst.size() + " Daps records as a result of ONLY Query-By-Example (QBE), text search pulled up NOTHING for string " + searchText);
         	retrieved = xlst.size();
 	        return xlst;
     	}
     	
     	
-    	List <Need> ivec = new Vector<Need>();
+    	List <Dap> ivec = new Vector<Dap>();
     	// if both are empty, return this Empty vector. 
     	if (xlst.size() == 0 && tlst.size() == 0)
     	{
-        	logger.info("Neither QBE nor text search for string " + searchText +  " pulled up ANY Needs Records.");
-        	retrieved = 0;
-    		return ivec;
+          logger.info("Neither QBE nor text search for string " + searchText +  " pulled up ANY Daps Records.");
+          retrieved = 0;
+    	  return ivec;
     	}
     	
 
 
     	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     	// now deal with BOTH text and QBE being non-empty lists - implementing intersection by Database Primary Key -  Id
-    	Iterator<Need> xiterator = xlst.iterator();
+    	Iterator<Dap> xiterator = xlst.iterator();
     	while (xiterator.hasNext()) 
     	{
-    		Need x = xiterator.next();
+    		Dap x = xiterator.next();
     		Long xid = x.getId();
     		
-        	Iterator<Need> titerator = tlst.iterator();
+        	Iterator<Dap> titerator = tlst.iterator();
     		while(titerator.hasNext())
     		{
-        		Need t = titerator.next();
+        		Dap t = titerator.next();
         		Long tid = t.getId();
     			
         		if (tid == xid)
@@ -712,7 +686,7 @@ public class Needs
     	}
     	// sort again - 
     	if (ivec.size() > 0)  Collections.sort(ivec);
-    	logger.info("Returning " + ivec.size() + " Needs records from COMBINED (text, QBE) Search");
+    	logger.info("Returning " + ivec.size() + " Daps records from COMBINED (text, QBE) Search");
     	retrieved = ivec.size();
     	return ivec;
     }
@@ -725,9 +699,9 @@ public class Needs
   //  QBE Setter 
   //  
 
-  public void seExample(Need needExample) 
+  public void seExample(Dap x) 
   {
-    this.example = needExample;
+    this.example = x;
   }
 
   
@@ -735,7 +709,7 @@ public class Needs
   ///////////////////////////////////////////////////////
   // private methods 
   
-  private void clearSectors(Need x)
+  private void clearSectors(Dap x)
   {
       x.setPublicHealth(false);
       x.setInfrastructure(false);
@@ -748,7 +722,7 @@ public class Needs
       x.setCrossDisciplinary(false);
       x.setOtherSector(false);
   }
-  private void clearRegions(Need x)
+  private void clearRegions(Dap x)
   {
 	x.setInternational(false);
 	x.setNational(false);
@@ -756,15 +730,15 @@ public class Needs
 	x.setLocalCity(false);
 	x.setProblemFocused(false);
   }
-  private void clearDisciplines(Need x)
+  private void clearDisciplines(Dap x)
   {
-	  x.setPhysical(false);
-	  x.setEcologicalAndBiological(false);
-	  x.setGeological(false);
-	  x.setChemical(false);
-	  x.setSocialAndEconomic(false);
+    x.setPhysical(false);
+    x.setEcologicalAndBiological(false);
+    x.setGeological(false);
+    x.setChemical(false);
+    x.setSocialAndEconomic(false);
   }
-  private void clearServices(Need x)
+  private void clearServices(Dap x)
   {
       x.setEngagement(false);
       x.setEducation(false);
@@ -774,7 +748,7 @@ public class Needs
       x.setPolicyGuidance(false);
       x.setOtherServices(false);
   }
-  private void clearProducts(Need x)
+  private void clearProducts(Dap x)
   {
       x.setHindcasts(false);
       x.setForecastsAndOutlooks(false);
@@ -783,7 +757,7 @@ public class Needs
       x.setAssessments(false);
       x.setOtherProducts(false);
   }
-  private void clearData(Need x)
+  private void clearData(Dap x)
   {
       x.setInsituObservations(false);
       x.setSatelliteRemoteObservations(false);

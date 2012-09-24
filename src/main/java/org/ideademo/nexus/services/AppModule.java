@@ -19,6 +19,9 @@ import org.slf4j.Logger;
  */
 public class AppModule
 {
+	
+	RevalidateHTTPHeader nocache = new RevalidateHTTPHeader();
+	
     public static void bind(ServiceBinder binder)
     {
         // binder.bind(MyServiceInterface.class, MyServiceImpl.class);
@@ -112,6 +115,7 @@ public class AppModule
         // set constraints to precisely control the invocation order of the contributed filter
         // within the pipeline.
 
+        configuration.add("NoCache", nocache);
         configuration.add("Timing", filter);
     }
 }

@@ -4,9 +4,9 @@
  
 <body id="bg2">
     <ul id="nav">
-     <li><a href="../index.php"><span>Home</span></a></li>
-     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Needs</u></t:pagelink></li>
-     <li><a href="../nexus/daps" title="Data, Products &amp; Services"><span>Data, Products &amp; Services</span></a></li>
+     <li><a href="../../index.php"><span>Home</span></a></li>
+     <li><a href="../nexus/needs" title="Needs"><span>Needs</span></a></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Data, Products &amp; Services</u></t:pagelink></li>
      <li><a href="../nexus/paws" title="Projects &amp; Activities"><span>Projects &amp; Activities</span></a></li>
      <li><a href="javascript:alert('Under Construction');" title="Partners &amp; Programs"><span>Partners &amp; Programs</span></a></li>
      <li><a href="javascript:alert('Under Construction');" title="Bibliography"><span>Bibliography</span></a></li>
@@ -62,7 +62,7 @@
                    <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
-                   (<t:pagelink page="need/search" target="_blank">Advanced</t:pagelink>)
+                   (<t:pagelink page="dap/search" target="_blank">Advanced</t:pagelink>)
                  </td>
 		      </tr>
 		    </table>
@@ -99,7 +99,7 @@
      </colgroup>
      <tr>
       <td>Description</td>
-      <td>${row.description}(<t:pagelink page="need/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+      <td>${row.description}(<t:pagelink page="dap/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
      </tr>
      
      <tr>
@@ -135,41 +135,6 @@
        </td>
      </tr>
 
-     <tr>
-      <td>Priority</td>
-      <td>
-        <t:if test="${row.high}"><img src="${context:layout/images/high.jpg}" alt="High" title="High" /></t:if> 
-        <t:if test="${row.mid}"><img src="${context:layout/images/mid.jpg}" alt="Mid" title="Mid" /></t:if> 
-        <t:if test="${row.low}"><img src="${context:layout/images/low.jpg}" alt="Low" title="Low" /></t:if>
-        <t:if test="${row.unknown}"><ul style="display: inline;margin-left: 0;padding-left: 0;"><li style="margin-left: 13px;">Unknown</li></ul></t:if>
-       </td>
-     </tr>
-     
-     
-     <tr>
-      <td>Focus Area</td>
-      <td>
-        <t:if test="${row.sustainability}"><img src="${context:layout/images/sustainability.jpg}" alt="${message:SUSTAINABILITY}" title="${message:SUSTAINABILITY}" /></t:if> 
-        <t:if test="${row.resilience}"><img src="${context:layout/images/resilience.jpg}" alt="${message:RESILIENCE}" title="${message:RESILIENCE}" /></t:if> 
-        <t:if test="${row.water}"><img src="${context:layout/images/water.jpg}" alt="${message:WATER}" title="${message:WATER}" /></t:if>
-        <t:if test="${row.extremes}"><img src="${context:layout/images/extremes.jpg}" alt="${message:EXTREMES}" title="${message:EXTREMES}" /></t:if> 
-        <t:if test="${row.conservation}"><img src="${context:layout/images/conservation.jpg}" alt="${message:CONSERVATION}" title="${message:CONSERVATION}" /></t:if>
-       </td>
-     </tr>
-          
-     <tr>
-      <td>Discipline</td>
-      <td>
-       <ul style="display: inline;margin-left: 0;padding-left: 0;">
-        <t:if test="${row.physical}"><li style="margin-left: 13px;">${message:PHY}</li></t:if> 
-        <t:if test="${row.ecologicalAndBiological}"><li style="margin-left: 13px;">${message:BIO}</li></t:if> 
-        <t:if test="${row.geological}"><li style="margin-left: 13px;">${message:GEO}</li></t:if> 
-        <t:if test="${row.chemical}"><li style="margin-left: 13px;">${message:CHEM}</li></t:if> 
-        <t:if test="${row.climateSocietyInteractions}"><li style="margin-left: 13px;">${message:SOCIO}</li></t:if> 
-        </ul>
-       </td>
-     </tr>
-     
           
      <tr>
       <td>Sector</td>
@@ -189,6 +154,16 @@
        </td>
      </tr>
 
+     <tr>
+      <td>Focus Area</td>
+      <td>
+        <t:if test="${row.sustainability}"><img src="${context:layout/images/sustainability.jpg}" alt="${message:SUSTAINABILITY}" title="${message:SUSTAINABILITY}" /></t:if> 
+        <t:if test="${row.resilience}"><img src="${context:layout/images/resilience.jpg}" alt="${message:RESILIENCE}" title="${message:RESILIENCE}" /></t:if> 
+        <t:if test="${row.water}"><img src="${context:layout/images/water.jpg}" alt="${message:WATER}" title="${message:WATER}" /></t:if>
+        <t:if test="${row.extremes}"><img src="${context:layout/images/extremes.jpg}" alt="${message:EXTREMES}" title="${message:EXTREMES}" /></t:if> 
+        <t:if test="${row.conservation}"><img src="${context:layout/images/conservation.jpg}" alt="${message:CONSERVATION}" title="${message:CONSERVATION}" /></t:if>
+       </td>
+     </tr>
      
      <tr>
       <td>Region</td>
@@ -204,19 +179,8 @@
      </tr>
      
      <tr>
-      <td>Source</td>
-      <td>${row.source}</td>
-     </tr>
-
-     <tr>
-      <td>Links</td>
-      <td>
-       <ul style="display: inline;margin-left: 0;padding-left: 0;">
-         <t:if test="${row.data}"><li style="margin-left: 13px;">Data: ${row.data}</li></t:if>
-         <t:if test="${row.products}"><li style="margin-left: 13px;">Products: ${row.products}</li></t:if>
-         <t:if test="${row.services}"><li style="margin-left: 13px;">Data: ${row.services}</li></t:if>
-       </ul>
-      </td>
+      <td>Resources</td>
+      <td>${row.resources}</td>
      </tr>
 
 
