@@ -106,8 +106,20 @@ public class Org implements Comparable<Org>
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getUrl() {
-		return url;
+	public String getUrl() 
+	{
+		if (url == null || url.trim().length() == 0)
+		{
+			return "";
+		}
+	    else if (url.toLowerCase().startsWith("http"))
+		{
+		  return url;
+		}
+	    else
+	    {
+	    	return "http://" + url;
+	    }
 	}
 	public void setUrl(String url) {
 		this.url = url;
