@@ -18,7 +18,7 @@ public class SearchNeed
    
    Object onSelectedFromSearch() 
    {
- 	needs.seExample(entity);
+ 	needs.setExample(entity);
     return needs;
    }
 

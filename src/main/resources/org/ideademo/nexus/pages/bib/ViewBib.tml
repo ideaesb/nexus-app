@@ -1,0 +1,41 @@
+<html t:type="longform" title="Bibliography Worksheet"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+      
+<body>
+   <t:form t:id="bib" class="appnitro">
+   
+   <div class="form_description">
+     <h2>Eastern Region RCSD Bibliography &amp; Assessments (BIBS) Worksheet</h2>
+     <p>Use this form to add or update a BIBS record into EPiko (Worsheet Version April 27 2012)</p>
+   </div>		
+   
+   <t:errors/>
+
+   <ul>
+     
+     <li id="li_name">
+      <t:label class="description" for="name" />
+      <div>
+       <t:textArea t:id="name" t:validate="maxlength=255" rows="3" cols="90" value="entity.name" />
+      </div>
+     </li>
+
+	<li id="li_description">
+	<t:label class="description" for="description" />
+	<t:textArea t:id="description" t:validate="maxlength=4096" rows="3" cols="90" value="entity.description" />
+	</li>
+   	<li id="li_url">
+	<t:label class="description" for="url" />
+	<t:textArea t:id="url" t:validate="maxlength=255" rows="3" cols="90" value="entity.url" />
+	</li>
+	<li id="li_keywords">
+	<t:label class="description" for="keywords" />
+	<t:textArea t:id="keywords" t:validate="maxlength=4096" rows="3" cols="90" value="entity.keywords" />
+	</li>
+
+   </ul>
+  </t:form>	
+    
+ </body>
+</html>

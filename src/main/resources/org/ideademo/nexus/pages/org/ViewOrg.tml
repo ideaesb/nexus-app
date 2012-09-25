@@ -1,0 +1,110 @@
+<html t:type="longform" title="Partner Worksheet"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+      
+<body>
+   <t:form t:id="org" class="appnitro">
+   
+   <div class="form_description">
+     <h2>Eastern Region RCSD Partners &amp; Programs (PAPS) Worksheet</h2>
+     <p>Use this form to add or update a PAPS record into EPiko (Worsheet Version April 27 2012)</p>
+   </div>		
+   
+   <t:errors/>
+   
+   <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('ppBox');" title="Show or Hide">Partner and/or Program</legend>
+       <div id="ppBox" class="unhidden">
+        <t:checkbox t:id="partner" t:value="entity.partner" class="element checkbox" /><t:label for="partner" class="choice"/>
+        <t:checkbox t:id="program" t:value="entity.program" class="element checkbox" /><t:label for="program" class="choice"/>
+       </div>
+       
+      </fieldset>
+     </li>
+   
+
+   <ul>
+   
+     <li id="li_code">
+      <t:label class="description" for="code" />
+      <t:textField t:id="code" t:validate="maxlength=255" size="15" value="entity.code" />
+     </li>
+     
+     <li id="li_name">
+      <t:label class="description" for="name" />
+      <div>
+       <t:textArea t:id="name" t:validate="maxlength=255" rows="3" cols="90" value="entity.name" />
+      </div>
+     </li>
+
+
+     <li id="li_contact">
+      <t:label class="description" for="contact" />
+      <div>
+       <t:textArea t:id="contact" t:validate="maxlength=255" rows="2" cols="90" value="entity.contact" />
+      </div>
+     </li>
+
+
+     <li id="li_email">
+      <t:label class="description" for="email" />
+      <div>
+       <t:textArea t:id="email" t:validate="maxlength=255" rows="2" cols="90" value="entity.email" />
+      </div>
+     </li>
+
+	<li id="li_description">
+	<t:label class="description" for="description" />
+	<t:textArea t:id="description" t:validate="maxlength=4096" rows="3" cols="90" value="entity.description" />
+	</li>
+
+	<li id="li_affiliations">
+	<t:label class="description" for="affiliations" />
+	<t:textArea t:id="affiliations" t:validate="maxlength=255" rows="3" cols="90" value="entity.affiliations" />
+	</li>
+
+  	<li id="li_url">
+	<t:label class="description" for="url" />
+	<t:textArea t:id="url" t:validate="maxlength=255" rows="3" cols="90" value="entity.url" />
+	</li>
+	<li id="li_logo">
+	<t:label class="description" for="logo" />
+	<t:textArea t:id="logo" t:validate="maxlength=255" rows="3" cols="90" value="entity.logo" />
+	</li>
+	<li id="li_worksheet">
+	<t:label class="description" for="worksheet" />
+	<t:textArea t:id="worksheet" t:validate="maxlength=255" rows="3" cols="90" value="entity.worksheet" />
+	</li>
+	<li id="li_keywords">
+	<t:label class="description" for="keywords" />
+	<t:textArea t:id="keywords" t:validate="maxlength=4096" rows="3" cols="90" value="entity.keywords" />
+	</li>
+
+     <li>     
+     <fieldset>
+
+      <legend class="description" onclick="javascript:hideToggle('catBox');" title="Show or Hide">Category or Type</legend>
+       <div id="catBox" class="unhidden">
+		
+        <t:checkbox t:id="federal" t:value="entity.federal" class="element checkbox" /><t:label for="federal" class="choice" />
+        <t:checkbox t:id="state" t:value="entity.state" class="element checkbox" /><t:label for="state" class="choice" />
+        <t:checkbox t:id="local" t:value="entity.local" class="element checkbox" /><t:label for="local" class="choice" />
+        <t:checkbox t:id="interagency" t:value="entity.interagency" class="element checkbox" /><t:label for="interagency" class="choice" />
+        <t:checkbox t:id="academic" t:value="entity.academic" class="element checkbox" /><t:label for="academic" class="choice" />
+        <t:checkbox t:id="ngo" t:value="entity.ngo" class="element checkbox" /><t:label for="ngo" class="choice" />
+        <t:checkbox t:id="otherPartnerType" t:value="entity.otherPartnerType" class="element checkbox" /><t:label for="otherPartnerType" class="choice" />
+		
+       </div>
+       
+      </fieldset>
+     </li>
+
+
+
+   </ul>
+  </t:form>	
+    
+ </body>
+</html>

@@ -18,7 +18,7 @@ public class SearchDap
    
    Object onSelectedFromSearch() 
    {
- 	daps.seExample(entity);
+ 	daps.setExample(entity);
     return daps;
    }
 

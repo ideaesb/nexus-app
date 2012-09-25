@@ -1592,6 +1592,20 @@ public class Need implements Comparable<Need>
 		this.worksheetExists = worksheetExists;
 	}
 	
+	//private String cleanedSource = "";
+	public String getCleanSource()
+	{
+		if (source == null || source.trim().length() == 0)
+		{
+			return "";
+		}
+		else
+		{
+			//Replacing all non-alphanumeric characters with empty strings, keep spaces
+			return source.replaceAll("[^A-Za-z0-9 ]", ""); 
+		}
+			
+	}
 	
 	////////////////////////////////////////////////
 	/// default/natural sort order - String  - names

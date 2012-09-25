@@ -1,15 +1,15 @@
-<html t:type="layout" title="needs"
+<html t:type="layout" title="Paws"
       xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
       xmlns:p="tapestry:parameter">
  
-<body id="bg2">
+<body id="bg4">
     <ul id="nav">
-     <li><a href="../index.php"><span>Home</span></a></li>
-     <li><a href="../nexus/needs" title="Needs"><span>Needs</span></a></li>
-     <li><a href="../nexus/daps" title="Data, Products &amp; Services"><span>Data, Products &amp; Services</span></a></li>
+     <li><t:pagelink page="home" title="Home">Home</t:pagelink></li>
+     <li><t:pagelink page="needs" title="Needs">Needs</t:pagelink></li>
+     <li><t:pagelink page="daps" title="Data, Products &amp; Services">Data, Products &amp; Services</t:pagelink></li>
      <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Projects &amp; Activities</u></t:pagelink></li>
-     <li><a href="javascript:alert('Under Construction');" title="Partners &amp; Programs"><span>Partners &amp; Programs</span></a></li>
-     <li><a href="javascript:alert('Under Construction');" title="Bibliography"><span>Bibliography</span></a></li>
+     <li><t:pagelink page="orgs"  title="Partners &amp; Programs">Partners &amp; Programs</t:pagelink></li>
+     <li><t:pagelink page="bibs" title="Bibliography">Bibliography</t:pagelink></li>
     </ul>
     
 

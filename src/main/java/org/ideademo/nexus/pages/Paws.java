@@ -1,9 +1,17 @@
 package org.ideademo.nexus.pages;
+
+import java.io.StringReader;
+import java.io.IOException;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.Vector;
+
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.util.Version;
 
 import org.apache.tapestry5.PersistenceConstants;
 
@@ -38,6 +46,7 @@ public class Paws
 {
 	 
   private static Logger logger = Logger.getLogger(Paws.class);
+  private static final StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_31); 
 
   
   /////////////////////////////
@@ -354,12 +363,26 @@ public class Paws
 		        .onFields("code","name","description", "keywords","contact", "url", "objectives", "worksheet", "feedback");
        
        BooleanJunction<BooleanJunction> bool = qb.bool();
-       /////// Tokenize the search string for default AND logic ///
-       StringTokenizer st = new StringTokenizer(searchText);
-       while (st.hasMoreElements()) {
-    	   bool.must(onFields.matching(st.nextElement()).createQuery());
+       TokenStream stream = analyzer.tokenStream(null, new StringReader(searchText));
+       CharTermAttribute cattr = stream.addAttribute(CharTermAttribute.class);
+       try
+       {
+        while (stream.incrementToken()) 
+         {
+    	   String token = cattr.toString();
+    	   logger.info("Adding search token " +  token + " to look in Paws database");
+    	   bool.must(onFields.matching(token).createQuery());
+         }
+        stream.end(); 
+        stream.close(); 
+       }
+       catch (IOException ioe)
+       {
+    	   logger.warn("Paws Text Search: Encountered problem tokenizing search term " + searchText);
+    	   logger.warn(ioe);
        }
        
+       /////////////  the lucene query built from non-simplistic English words 
        org.apache.lucene.search.Query luceneQuery = bool.createQuery();
        
        tlst = fullTextSession.createFullTextQuery(luceneQuery, Paw.class).list();
@@ -476,7 +499,7 @@ public class Paws
   //  QBE Setter 
   //  
 
-  public void seExample(Paw x) 
+  public void setExample(Paw x) 
   {
     this.example = x;
   }

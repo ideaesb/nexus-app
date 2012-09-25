@@ -17,7 +17,7 @@ public class SearchPaw
    
    Object onSelectedFromSearch() 
    {
- 	paws.seExample(entity);
+ 	paws.setExample(entity);
     return paws;
    }
 

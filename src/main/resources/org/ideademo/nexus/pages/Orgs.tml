@@ -1,0 +1,125 @@
+<html t:type="layout" title="Partners"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+ 
+<body id="bg1">
+    <ul id="nav">
+     <li><t:pagelink page="home" title="Home">Home</t:pagelink></li>
+     <li><t:pagelink page="needs" title="Needs">Needs</t:pagelink></li>
+     <li><t:pagelink page="daps" title="Data, Products &amp; Services">Data, Products &amp; Services</t:pagelink></li>
+     <li><t:pagelink page="paws" title="Projects &amp; Activities">Projects &amp; Activities</t:pagelink></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Partners &amp; Programs</u></t:pagelink></li>
+     <li><t:pagelink page="bibs" title="Bibliography">Bibliography</t:pagelink></li>
+    </ul>
+    
+
+    <div id = "bodyContainer"> 
+		<div id ="searchContainer" style="margin-top: 35px;margin-bottom: 25px;">
+		
+		 <form t:type="form" t:id="searchCriteria" action="needs" method="post">
+		    <table width="750" style="border-collapse: collapse; border-spacing: 0;">
+		     <tr class="title-blue" border="1">
+		        <td  align="right" width="150">Search</td>
+		        <td align="left">
+                   <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
+                   <t:submit t:id="search" value="Go" />
+                   <t:submit t:id="clear" value="Clear/Show All" />
+                   (<t:pagelink page="org/search" target="_blank">Advanced</t:pagelink>)
+                 </td>
+		      </tr>
+		    </table>
+		   </form>
+		</div><!-- End of "searchContainer" -->
+    
+ <div id="container3"><!-- Contains the accordion. Allows for padding on the top of the accordion to fit and look better on page-->
+  <div id="container2"><!-- This contains the scroll css code. -->
+   <div id="Accordion1" class="Accordion" tabindex="0">
+
+
+   
+     <div class="AccordionPanel" t:type="Loop" t:source="list" t:value="row">
+      <div class="AccordionPanelTab">
+
+       <table class="project-box">
+        <colgroup>
+          <col class="title-blue" />
+        </colgroup>
+        <tr>
+         <td width="67" style="width: 67px">Name</td>
+         <td>${row.name}</td>
+        </tr>
+       </table>
+
+    </div><!-- End Accordion Panel Tab -->
+
+
+    <div class="AccordionPanelContent"><!--added by cameron-->
+
+    <table class="project-box">
+     <colgroup>
+      <col class="title-blue" />
+     </colgroup>
+     
+     
+    <tr>
+      <td>Web</td>
+      <td><a href="${row.url}" target="_blank">${row.url}</a></td>
+     </tr>
+     
+     <tr>
+      <td>Contact</td>
+      <td>${row.contact} <t:if test="${row.email}">(<a href="mailto:${row.email}">${row.email}</a>)</t:if></td>
+     </tr>
+     
+     <t:if test="${row.logo}">
+      <tr>
+        <td>Logo</td>
+        <td><img src="${context:layout/images}/${row.logo}" /></td>
+      </tr>
+     </t:if>
+     
+     
+     <tr>
+      <td width="67" style="width: 67px">Description</td>
+      <td>${row.description}(<t:pagelink page="org/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+     </tr>
+
+     <tr>
+      <td>Type</td>
+      <td>
+        <t:if test="${row.partner}"><li style="margin-left: 13px;">Partner</li></t:if> 
+        <t:if test="${row.program}"><li style="margin-left: 13px;">Program</li></t:if> 
+        <t:if test="${row.federal}"><li style="margin-left: 13px;">Federal</li></t:if>
+        <t:if test="${row.state}"><li style="margin-left: 13px;">State</li></t:if>
+        <t:if test="${row.local}"><li style="margin-left: 13px;">Local</li></t:if>
+        <t:if test="${row.interagency}"><li style="margin-left: 13px;">Interagency</li></t:if>
+        <t:if test="${row.academic}"><li style="margin-left: 13px;">Academic</li></t:if>
+        <t:if test="${row.ngo}"><li style="margin-left: 13px;">Non-governmental Organization (NGO)</li></t:if>
+        <t:if test="${row.otherPartnerType}"><li style="margin-left: 13px;">Unclassified/Other</li></t:if>
+       </td>
+     </tr>
+
+    </table>
+
+        <!-- Column 1 end -->
+    </div><!-- End of AccordionPanelContent -->
+   </div><!-- End of AccordionPanel (both content and tab)  -->
+
+
+   </div><!-- End of Accordion 1 -->
+  </div><!-- End of "container 2" -->
+ </div><!-- End of "container 3" -->
+ <div style="float:right;width:280px;word-spacing:6px;font-size:80%;padding-right:10px;padding-top:2px;color:#888888;white-space:nowrap;text-align:right;">
+  ${retrieved} of ${total} records</div>
+
+  
+    
+    
+    </div><!--end of bodyContainer-->
+    
+<script type="text/javascript"><!--added by cameron-->
+var Accordion1 = new Spry.Widget.Accordion("Accordion1",{useFixedPanelHeights: false, defaultPanel: -1 });
+</script><!--(works only if loaded at end) -->
+
+</body>
+</html>
