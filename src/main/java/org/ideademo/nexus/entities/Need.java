@@ -1,6 +1,7 @@
 package org.ideademo.nexus.entities;
 
 import java.lang.Comparable;
+import java.util.StringTokenizer;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -1593,6 +1594,37 @@ public class Need implements Comparable<Need>
 	}
 	
 	//private String cleanedSource = "";
+	public String getBibTokens()
+	{
+		if (this.keywords == null || keywords.trim().length() == 0)
+		{
+			// protect against nulls, empty
+			return "";
+		}
+		else if (this.keywords.indexOf("BIB") > -1) 
+		{
+			StringTokenizer st = new StringTokenizer(this.keywords);
+			StringBuffer sb = new StringBuffer();
+			int count = 0;
+			while (st.hasMoreElements()) 
+			{
+				String token = (String) st.nextElement();
+				if (token.startsWith("BIB"))
+				{
+					if (count > 0)  sb.append(" ");
+					sb.append(token);
+					count++;
+				}
+			}
+			return sb.toString();
+		}
+		else
+		{
+			// no BIB keywords - just search for whatever is in the source
+			return getCleanSource();
+		}
+			
+	}
 	public String getCleanSource()
 	{
 		if (source == null || source.trim().length() == 0)

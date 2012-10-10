@@ -164,6 +164,20 @@ public class Bibs
        /////////////  the lucene query built from non-simplistic English words 
        org.apache.lucene.search.Query luceneQuery = bool.createQuery();
        
+       ////////////////////////////////////////////////////////////////////////////
+       //  HACK!!
+       //
+       
+       // if search terms have "BIB" then just create the old-fashioned keyword "OR logic" query - just limited to keywords field, though
+       if (searchText.indexOf("BIB") > -1)
+       {
+    	   luceneQuery = qb
+   			    .keyword()
+   			    .onFields("keywords")
+   			    .matching(searchText)
+   			    .createQuery();  
+       }
+       
        tlst = fullTextSession.createFullTextQuery(luceneQuery, Bib.class).list();
        if (tlst != null) 
        {

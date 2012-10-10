@@ -205,7 +205,7 @@
      
      <tr>
       <td>Source</td>
-      <td><t:pagelink page="bibs" context="${row.cleanSource}" target="_blank">${row.source}</t:pagelink></td>
+      <td><t:pagelink page="bibs" context="${row.bibTokens}" target="_blank">${row.source}</t:pagelink></td>
      </tr>
 
      <tr>
