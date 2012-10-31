@@ -188,12 +188,17 @@ public class Daps
    *  INT=International
    *  NAT=National
    *  REG=Regional Or State
+   *  NENG=-- New England
+   *  MIDA=-- Mid-Atlantic
+   *  CENT=-- Central
+   *  GRTL=-- Great Lakes
+   *  STHE=-- South East
    *  LOC=Local/City
    *  OTH=Other/Problem Focused
    */
   public enum Regions
   {
-    INT, NAT, REG, LOC, OTH
+    INT, NAT, REG, NENG, MIDA, CENT, GRTL, STHE, LOC, OTH
   }
   
 
@@ -505,6 +510,26 @@ public class Daps
     {
       example.setRegionalOrState(true);
     }
+    else if (choice.equalsIgnoreCase("NENG"))
+    {
+      example.setNewEngland(true);
+    }
+    else if (choice.equalsIgnoreCase("MIDA"))
+    {
+      example.setMidAtlantic(true);
+    }
+    else if (choice.equalsIgnoreCase("CENT"))
+    {
+      example.setCentral(true);
+    }
+    else if (choice.equalsIgnoreCase("GRTL"))
+    {
+      example.setGreatLakes(true);
+    }
+    else if (choice.equalsIgnoreCase("STHE"))
+    {
+      example.setSouthEast(true);
+    }
     else if (choice.equalsIgnoreCase("LOC"))
     {
       example.setLocalCity(true);
@@ -751,6 +776,11 @@ public class Daps
 	x.setInternational(false);
 	x.setNational(false);
 	x.setRegionalOrState(false);
+		x.setNewEngland(false);
+		x.setMidAtlantic(false);
+		x.setCentral(false);
+		x.setGreatLakes(false);
+		x.setSouthEast(false);
 	x.setLocalCity(false);
 	x.setProblemFocused(false);
   }

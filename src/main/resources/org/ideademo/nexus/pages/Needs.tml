@@ -147,7 +147,7 @@
      
      
      <tr>
-      <td>Focus Area</td>
+      <td style="width: 67px;word-wrap: break-word">Focus Area</td>
       <td>
         <t:if test="${row.sustainability}"><img src="${context:layout/images/sustainability.jpg}" alt="${message:SUSTAINABILITY}" title="${message:SUSTAINABILITY}" /></t:if> 
         <t:if test="${row.resilience}"><img src="${context:layout/images/resilience.jpg}" alt="${message:RESILIENCE}" title="${message:RESILIENCE}" /></t:if> 
@@ -196,7 +196,13 @@
        <ul style="display: inline;margin-left: 0;padding-left: 0;">
         <t:if test="${row.international}"><li style="margin-left: 13px;">${message:INT}</li></t:if> 
         <t:if test="${row.national}"><li style="margin-left: 13px;">${message:NAT}</li></t:if> 
-        <t:if test="${row.regionalOrState}"><li style="margin-left: 13px;">${message:REG}</li></t:if> 
+        <t:if test="${row.regionalOrState}"><li style="margin-left: 13px;">${message:REG} 
+          <t:if test="${row.newEngland}"> ${message:NENG} </t:if> 
+          <t:if test="${row.midAtlantic}"> ${message:MIDA} </t:if> 
+          <t:if test="${row.central}"> ${message:CENT} </t:if> 
+          <t:if test="${row.greatLakes}"> ${message:GRTL} </t:if> 
+          <t:if test="${row.southEast}"> ${message:STHE} </t:if>
+         </li></t:if>
         <t:if test="${row.localCity}"><li style="margin-left: 13px;">${message:LOC}</li></t:if> 
         <t:if test="${row.problemFocused}"><li style="margin-left: 13px;">${message:OTH}</li></t:if> 
         </ul>
@@ -205,7 +211,13 @@
      
      <tr>
       <td>Source</td>
-      <td><t:pagelink page="bibs" context="${row.bibTokens}" target="_blank">${row.source}</t:pagelink></td>
+      <td><t:if test="${row.bibTokens}">
+            <t:pagelink page="bibs" context="${row.bibTokens}" target="_blank">${row.source}</t:pagelink>
+           <p:else>
+            ${row.source}
+           </p:else>
+          </t:if>
+      </td>          
      </tr>
 
      <tr>
@@ -221,7 +233,7 @@
 
 
      <tr>
-      <td>Lead Agencies</td>
+      <td style="width: 67px;word-wrap: break-word">Lead Agencies</td>
       <td>${row.organization}</td>
      </tr>
 

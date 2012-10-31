@@ -165,9 +165,8 @@ public class Bibs
        org.apache.lucene.search.Query luceneQuery = bool.createQuery();
        
        ////////////////////////////////////////////////////////////////////////////
-       //  HACK!!
+       //  Override "normal" search 
        //
-       
        // if search terms have "BIB" then just create the old-fashioned keyword "OR logic" query - just limited to keywords field, though
        if (searchText.indexOf("BIB") > -1)
        {

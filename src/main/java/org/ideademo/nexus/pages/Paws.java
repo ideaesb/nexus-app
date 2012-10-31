@@ -38,6 +38,7 @@ import org.hibernate.search.query.dsl.TermMatchingContext;
 
 
 import org.ideademo.nexus.entities.Paw;
+import org.ideademo.nexus.pages.Daps.Regions;
 
 import org.apache.log4j.Logger;
 
@@ -122,7 +123,6 @@ public class Paws
   }
 
   
-  // the regions select box
   @Property
   @Persist (PersistenceConstants.FLASH)
   private Regions regions;  // AOA = Area of Applicability
@@ -130,12 +130,17 @@ public class Paws
    *  INT=International
    *  NAT=National
    *  REG=Regional Or State
+   *  NENG=-- New England
+   *  MIDA=-- Mid-Atlantic
+   *  CENT=-- Central
+   *  GRTL=-- Great Lakes
+   *  STHE=-- South East
    *  LOC=Local/City
    *  OTH=Other/Problem Focused
    */
   public enum Regions
   {
-    INT, NAT, REG, LOC, OTH
+    INT, NAT, REG, NENG, MIDA, CENT, GRTL, STHE, LOC, OTH
   }
   
 
@@ -284,6 +289,26 @@ public class Paws
     else if (choice.equalsIgnoreCase("REG"))
     {
       example.setRegionalOrState(true);
+    }
+    else if (choice.equalsIgnoreCase("NENG"))
+    {
+      example.setNewEngland(true);
+    }
+    else if (choice.equalsIgnoreCase("MIDA"))
+    {
+      example.setMidAtlantic(true);
+    }
+    else if (choice.equalsIgnoreCase("CENT"))
+    {
+      example.setCentral(true);
+    }
+    else if (choice.equalsIgnoreCase("GRTL"))
+    {
+      example.setGreatLakes(true);
+    }
+    else if (choice.equalsIgnoreCase("STHE"))
+    {
+      example.setSouthEast(true);
     }
     else if (choice.equalsIgnoreCase("LOC"))
     {
@@ -527,6 +552,11 @@ public class Paws
 	x.setInternational(false);
 	x.setNational(false);
 	x.setRegionalOrState(false);
+		x.setNewEngland(false);
+		x.setMidAtlantic(false);
+		x.setCentral(false);
+		x.setGreatLakes(false);
+		x.setSouthEast(false);
 	x.setLocalCity(false);
 	x.setProblemFocused(false);
   }
