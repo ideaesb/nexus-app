@@ -12,6 +12,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.beaneditor.NonVisual;
 
 
@@ -1583,6 +1584,34 @@ public class Need implements Comparable<Need>
 	}
 	public void setUnknown(boolean unknown) {
 		this.unknown = unknown;
+	}
+	
+	public boolean isHigh() {
+		return this.high;
+	}
+	public boolean isMid() {
+		return this.mid;
+	}
+	public boolean isLow() {
+		return this.low;
+	}
+	public boolean isUnknown() {
+		return this.unknown;
+	}
+	
+	public boolean isData()
+	{
+		return StringUtils.isNotBlank(this.data);
+	}
+	
+	public boolean isProducts()
+	{
+		return StringUtils.isNotBlank(this.products);
+	}
+	
+	public boolean isServices()
+	{
+		return StringUtils.isNotBlank(this.services);
 	}
 	
 	private boolean worksheetExists = false;

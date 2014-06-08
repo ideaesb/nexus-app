@@ -6,11 +6,13 @@
    <t:form t:id="org" class="appnitro">
    
    <div class="form_description">
-     <h2>Eastern Region RCSD Partners &amp; Programs (PAPS) Worksheet</h2>
-     <p>Use this form to add or update a PAPS record into EPiko (Worsheet Version April 27 2012)</p>
+     <h2>Eastern Region RCSD Organization (ORG) Worksheet</h2>
+     <p>Use this form to add or update a ORG record into EPiko (Worsheet Version May 14 2014)</p>
    </div>		
    
    <t:errors/>
+   
+   <!-- 
    
    <li>     
      <fieldset>
@@ -22,8 +24,9 @@
        </div>
        
       </fieldset>
-     </li>
+   </li>
    
+   -->
 
    <ul>
    
@@ -89,6 +92,7 @@
        <div id="catBox" class="unhidden">
 		
         <t:checkbox t:id="federal" t:value="entity.federal" class="element checkbox" /><t:label for="federal" class="choice" />
+        <t:checkbox t:id="province" t:value="entity.province" class="element checkbox" /><t:label for="province" class="choice" />
         <t:checkbox t:id="state" t:value="entity.state" class="element checkbox" /><t:label for="state" class="choice" />
         <t:checkbox t:id="local" t:value="entity.local" class="element checkbox" /><t:label for="local" class="choice" />
         <t:checkbox t:id="interagency" t:value="entity.interagency" class="element checkbox" /><t:label for="interagency" class="choice" />
@@ -97,7 +101,55 @@
         <t:checkbox t:id="otherPartnerType" t:value="entity.otherPartnerType" class="element checkbox" /><t:label for="otherPartnerType" class="choice" />
 		
        </div>
-       
+     </fieldset>
+     </li>
+     <li>
+     <fieldset> 
+         <legend class="description" onclick="javascript:hideToggle('aoaBox');" title="Show or Hide">Area of Applicability</legend>
+       <div id="aoaBox" class="unhidden">
+
+		<t:checkbox t:id="international" t:value="entity.international"  class="element checkbox" /><t:label for="international" class="choice" />
+		<t:checkbox t:id="canada" t:value="entity.canada"  class="element checkbox indent" /><t:label for="canada" class="indent" />
+		<t:checkbox t:id="newBrunswick" t:value="entity.newBrunswick"  class="element checkbox indent2" /><t:label for="newBrunswick" class="indent2" />
+		<t:checkbox t:id="novaScotia" t:value="entity.novaScotia"  class="element checkbox indent2" /><t:label for="novaScotia" class="indent2" />
+		<t:checkbox t:id="quebec" t:value="entity.quebec"  class="element checkbox indent2" /><t:label for="quebec" class="indent2" />
+		<t:checkbox t:id="princeEdwardIsland" t:value="entity.princeEdwardIsland"  class="element checkbox indent2" /><t:label for="princeEdwardIsland" class="indent2" />
+		<t:checkbox t:id="newfoundland" t:value="entity.newfoundland"  class="element checkbox indent2" /><t:label for="newfoundland" class="indent2" />
+		<t:checkbox t:id="labrador" t:value="entity.labrador"  class="element checkbox indent2" /><t:label for="labrador" class="indent2" />
+		<t:checkbox t:id="atlanticCanada" t:value="entity.atlanticCanada"  class="element checkbox indent" /><t:label for="atlanticCanada" class="indent" />
+		<t:checkbox t:id="national" t:value="entity.national"  class="element checkbox" /><t:label for="national" class="choice" />
+		<t:checkbox t:id="regionalOrState" t:value="entity.regionalOrState"  class="element checkbox" /><t:label for="regionalOrState" class="choice" />
+		<t:checkbox t:id="gulfOfMaine" t:value="entity.gulfOfMaine"  class="element checkbox indent" /><t:label for="gulfOfMaine" class="indent" />
+		<t:checkbox t:id="newEngland" t:value="entity.newEngland"  class="element checkbox indent" /><t:label for="newEngland" class="indent" />
+		<t:checkbox t:id="maine" t:value="entity.maine"  class="element checkbox indent2" /><t:label for="maine" class="indent2" />
+		<t:checkbox t:id="newHampshire" t:value="entity.newHampshire"  class="element checkbox indent2" /><t:label for="newHampshire" class="indent2" />
+		<t:checkbox t:id="massachusetts" t:value="entity.massachusetts"  class="element checkbox indent2" /><t:label for="massachusetts" class="indent2" />
+		<t:checkbox t:id="vermont" t:value="entity.vermont"  class="element checkbox indent2" /><t:label for="vermont" class="indent2" />
+		<t:checkbox t:id="connecticut" t:value="entity.connecticut"  class="element checkbox indent2" /><t:label for="connecticut" class="indent2" />
+		<t:checkbox t:id="rhodeIsland" t:value="entity.rhodeIsland"  class="element checkbox indent2" /><t:label for="rhodeIsland" class="indent2" />
+		<t:checkbox t:id="midAtlantic" t:value="entity.midAtlantic"  class="element checkbox indent" /><t:label for="midAtlantic" class="indent" />
+		<t:checkbox t:id="newYork" t:value="entity.newYork"  class="element checkbox indent2" /><t:label for="newYork" class="indent2" />
+		<t:checkbox t:id="newJersey" t:value="entity.newJersey"  class="element checkbox indent2" /><t:label for="newJersey" class="indent2" />
+		<t:checkbox t:id="pennsylvania" t:value="entity.pennsylvania"  class="element checkbox indent2" /><t:label for="pennsylvania" class="indent2" />
+		<t:checkbox t:id="marlyland" t:value="entity.marlyland"  class="element checkbox indent2" /><t:label for="marlyland" class="indent2" />
+		<t:checkbox t:id="delaware" t:value="entity.delaware"  class="element checkbox indent2" /><t:label for="delaware" class="indent2" />
+		<t:checkbox t:id="virginia" t:value="entity.virginia"  class="element checkbox indent2" /><t:label for="virginia" class="indent2" />
+		<t:checkbox t:id="districtOfColumbia" t:value="entity.districtOfColumbia"  class="element checkbox indent2" /><t:label for="districtOfColumbia" class="indent2" />
+		<t:checkbox t:id="central" t:value="entity.central"  class="element checkbox indent" /><t:label for="central" class="indent" />
+		<t:checkbox t:id="westVirginia" t:value="entity.westVirginia"  class="element checkbox indent2" /><t:label for="westVirginia" class="indent2" />
+		<t:checkbox t:id="greatLakes" t:value="entity.greatLakes"  class="element checkbox indent" /><t:label for="greatLakes" class="indent" />
+		<t:checkbox t:id="ohio" t:value="entity.ohio"  class="element checkbox indent2" /><t:label for="ohio" class="indent2" />
+		<t:checkbox t:id="southEast" t:value="entity.southEast"  class="element checkbox indent" /><t:label for="southEast" class="indent" />
+		<t:checkbox t:id="northCarolina" t:value="entity.northCarolina"  class="element checkbox indent2" /><t:label for="northCarolina" class="indent2" />
+		<t:checkbox t:id="southCarolina" t:value="entity.southCarolina"  class="element checkbox indent2" /><t:label for="southCarolina" class="indent2" />
+		<t:checkbox t:id="localCity" t:value="entity.localCity"  class="element checkbox" /><t:label for="localCity" class="choice" />
+		<t:checkbox t:id="problemFocused" t:value="entity.problemFocused"  class="element checkbox" /><t:label for="problemFocused" class="choice" />
+
+
+       </div>
+   
+   
+   
       </fieldset>
      </li>
 

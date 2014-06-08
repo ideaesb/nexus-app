@@ -8,7 +8,7 @@
      <li><t:pagelink page="needs" title="Needs">Needs</t:pagelink></li>
      <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Data, Products &amp; Services</u></t:pagelink></li>
      <li><t:pagelink page="paws" title="Projects &amp; Activities">Projects &amp; Activities</t:pagelink></li>
-     <li><t:pagelink page="orgs"  title="Partners &amp; Programs">Partners &amp; Programs</t:pagelink></li>
+     <li><t:pagelink page="orgs"  title="Organizations">Organizations</t:pagelink></li>
      <li><t:pagelink page="bibs" title="Bibliography">Bibliography</t:pagelink></li>
     </ul>
     
@@ -62,7 +62,10 @@
                    <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
-                   (<t:pagelink page="dap/search" target="_blank">Advanced</t:pagelink>)
+                   <!-- (<t:pagelink page="dap/search" target="_blank">Advanced</t:pagelink>) -->
+                   <t:if test="loggedIn">
+                     <t:submit t:id="pdf" name="Run Report" value="Run Report" /> 
+                   </t:if>
                  </td>
 		      </tr>
 		    </table>

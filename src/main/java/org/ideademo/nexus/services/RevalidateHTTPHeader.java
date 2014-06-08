@@ -20,6 +20,5 @@ public class RevalidateHTTPHeader implements RequestFilter
     response.setHeader(CACHE_CTRL, "no-cache, no-store, max-age=0, must-revalidate"); 
     response.setHeader(EXPIRE_DATE, "Sun, 07 Dec 1941  07:55:00 GMT"); 
     return handler.service(request, response);   
-	            
   }
 }

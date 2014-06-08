@@ -1,45 +1,72 @@
 package org.ideademo.nexus.pages;
 
+import java.awt.Toolkit;
 import java.io.StringReader;
 import java.io.IOException;
-
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
+import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.PersistenceConstants;
 
 import org.apache.tapestry5.annotations.PageActivationContext;
+import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.Persist;
 
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
-
 import org.apache.tapestry5.ioc.annotations.Inject;
 
 
 import org.hibernate.Session;
-
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 
 
+import org.ideademo.nexus.services.util.PDFStreamResponse;
+import org.ideademo.nexus.services.util.RDFStreamResponse;
+
+import org.apache.tapestry5.StreamResponse;
 import org.ideademo.nexus.entities.Bib;
 
+
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import com.hp.hpl.jena.rdf.model.*;
 
 import org.apache.log4j.Logger;
 
@@ -80,6 +107,12 @@ public class Bibs
   @Property 
   @Persist (PersistenceConstants.FLASH)
   int total;
+  @Inject
+  @Path("context:layout/images/noaa-logo.png")
+  private Asset logoAsset;
+  
+  @Inject 
+  HttpServletRequest request;
   
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   //  Entity List generator - QBE, Text Search or Show All 
@@ -296,7 +329,19 @@ public class Bibs
   }
 
   
-
+  public boolean getLoggedIn()
+  {
+	  if (StringUtils.isBlank(request.getRemoteUser()))
+	  {
+		  logger.info("User is NULL ");
+		  return false;
+	  }
+	  else
+	  {
+		  logger.info("User is NOTTT NULL............... user = " + request.getRemoteUser());
+		  return true;
+	  }
+  }
   
   ///////////////////////////////////////////////////////////////
   //  Action Event Handlers 
@@ -314,6 +359,143 @@ public class Bibs
     return null; 
   }
   
+  public StreamResponse onSelectedFromPdf() 
+  {
+      // Create PDF
+      InputStream is = getPdfTable(getList());
+      // Return response
+      return new PDFStreamResponse(is,"neXusCitations" + System.currentTimeMillis());
+  }
+
+  public StreamResponse onSelectedFromRdf() 
+  {
+      // Create PDF
+      InputStream is = getRdfStream(getList());
+      // Return response
+      return new RDFStreamResponse(is,"neXusCitations" + System.currentTimeMillis());
+  }
+
+  /*
+  public StreamResponse onSubmit() 
+  {
+      // Create PDF
+      InputStream is = PDFGenerator.generatePDF("Original PDF streaming...");
+      // Return response
+      return new PDFStreamResponse(is,"bibs" + System.currentTimeMillis());
+  }
+  */
   
+  private InputStream getRdfStream(List list)
+  {
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  
+	  Iterator<Bib> iterator = list.iterator();
+  	  while(iterator.hasNext())
+  	  {
+  		Bib bib = iterator.next();
+         Model model =  bib.getRDF();
+         model.write(baos, "TURTLE", "http://www.neclimateus.org/");
+  	  }
+      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+      return bais;
+  }
+  
+  private InputStream getPdfTable(List list) 
+  {
+
+      // step 1: creation of a document-object
+      Document document = new Document();
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+      try {
+              // step 2:
+              // we create a writer that listens to the document
+              // and directs a PDF-stream to a file
+              PdfWriter writer = PdfWriter.getInstance(document, baos);
+              // step 3: we open the document
+              document.open();
+              
+              java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
+              if (awtImage != null)
+              {
+            	  com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null); 
+            	  if (logo != null) document.add(logo);
+              }
+              
+              
+              
+              DateFormat formatter = new SimpleDateFormat
+                      ("EEE MMM dd HH:mm:ss zzz yyyy");
+                  Date date = new Date(System.currentTimeMillis());
+                  TimeZone eastern = TimeZone.getTimeZone("America/New_York");
+                  formatter.setTimeZone(eastern);
+
+              document.add(new Paragraph("NEClimateUS.org Bibliography Report " + formatter.format(date)));
+              
+              String subheader = "Printing " + retrieved + " of total " + total + " records.";
+              if (StringUtils.isNotBlank(searchText))
+              {
+            	  subheader += "  Searching for \"" + searchText + "\""; 
+              }
+              
+              document.add(new Paragraph(subheader));
+              document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+              
+              // create table, 2 columns
+           	Iterator<Bib> iterator = list.iterator();
+           	int count=0;
+       		while(iterator.hasNext())
+      		{
+       			count++;
+          		Bib bib = iterator.next();
+          		
+          		String name = bib.getName();
+          		String description = bib.getDescription();
+          		String url = bib.getUrl();
+          		
+                PdfPTable table = new PdfPTable(2);
+                table.setWidths(new int[]{1, 4});
+                table.setSplitRows(false);
+                
+                
+ 	
+                
+                
+                PdfPCell nameTitle = new PdfPCell(new Phrase("#" + count + ") Citation")); 
+                PdfPCell nameCell = new PdfPCell(new Phrase(name));
+                
+                nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                
+                table.addCell(nameTitle);  table.addCell(nameCell);          		          		
+          		
+          		if (StringUtils.isNotBlank(description))
+          		{
+          		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
+          		}
+          		if (StringUtils.isNotBlank(url))
+          		{
+            	  Anchor link = new Anchor(StringUtils.trimToEmpty(url)); link.setReference(StringUtils.trimToEmpty(url));
+          		  table.addCell(new PdfPCell(new Phrase("Url")));  table.addCell(new PdfPCell(link));
+          		}
+          		document.add(table);
+          		document.add(Chunk.NEWLINE);
+      		}
+              
+              
+      } catch (DocumentException de) {
+              logger.fatal(de.getMessage());
+      }
+      catch (IOException ie)
+      {
+    	 logger.warn("Could not find NOAA logo (likely)");
+    	 logger.warn(ie);
+      }
+
+      // step 5: we close the document
+      document.close();
+      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+      return bais;
+}
 
 }
