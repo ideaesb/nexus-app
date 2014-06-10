@@ -18,10 +18,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-
 import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.PersistenceConstants;
-
 import org.apache.tapestry5.annotations.PageActivationContext;
 import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Property;
@@ -30,8 +28,6 @@ import org.apache.tapestry5.annotations.Persist;
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
 import org.apache.tapestry5.ioc.annotations.Inject;
-
-
 import org.hibernate.Session;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
@@ -44,9 +40,21 @@ import org.hibernate.search.query.dsl.TermMatchingContext;
 
 import org.ideademo.nexus.services.util.PDFStreamResponse;
 import org.ideademo.nexus.services.util.RDFStreamResponse;
-
 import org.apache.tapestry5.StreamResponse;
-import org.ideademo.nexus.entities.Bib;
+
+
+
+//semantic web
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.sparql.vocabulary.FOAF;
+import com.hp.hpl.jena.vocabulary.RDF;
+
+import org.ideademo.nexus.vocabulary.NXS; // namespaces
+
+
+//to get message labels
+import org.apache.tapestry5.ioc.Messages;
+
 
 
 
@@ -66,9 +74,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import com.hp.hpl.jena.rdf.model.*;
+
 
 import org.apache.log4j.Logger;
+import org.ideademo.nexus.entities.Bib;
 
 
 public class Bibs 
@@ -113,6 +122,10 @@ public class Bibs
   
   @Inject 
   HttpServletRequest request;
+  
+  @Inject
+  private Messages messages;
+  
   
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   //  Entity List generator - QBE, Text Search or Show All 
@@ -393,7 +406,7 @@ public class Bibs
   	  while(iterator.hasNext())
   	  {
   		Bib bib = iterator.next();
-         Model model =  bib.getRDF();
+         Model model =  getModel(bib);
          model.write(baos, "TURTLE", "http://www.neclimateus.org/");
   	  }
       ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -497,5 +510,31 @@ public class Bibs
       ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
       return bais;
 }
+  
+  // create RDF graph element (bunch of triples )
+  private Model getModel(Bib bib)
+  {
+      Model model = ModelFactory.createDefaultModel();
+      
+      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/bib/view/"+bib.getId()); //TO DO - label the url  
+
+      if (StringUtils.isNotBlank(bib.getName())) 
+  	   {
+   	   model.add (resource, NXS.Citation, StringUtils.trimToEmpty(bib.getName()));
+      }
+      else
+      {
+   	   model.add (resource, NXS.Citation, "Citation with No Title");
+      }
+      
+      if (StringUtils.isNotBlank(bib.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(bib.getDescription()));
+      if (StringUtils.isNotBlank(bib.getUrl())) model.add(resource, NXS.Source, ResourceFactory.createResource(StringUtils.trimToEmpty(bib.getUrl())));
+      if (StringUtils.isNotBlank(bib.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(bib.getWorksheet()));
+      if (StringUtils.isNotBlank(bib.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(bib.getKeywords()));
+      
+      return model;
+
+  }
+
 
 }

@@ -27,7 +27,30 @@
 			 <artifactId>hibernate-search</artifactId>
 			 <version>3.4.2.Final</version>
 			</dependency>
-
+			<!--  streamed pdf generation -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.4.4</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	<dependency>
+    <groupId>org.apache.jena</groupId>
+    <artifactId>apache-jena-libs</artifactId>
+    <type>pom</type>
+    <version>2.11.1</version> <!-- Set version -->
+  </dependency>
+<dependency>
+    <groupId>xerces</groupId>
+    <artifactId>xercesImpl</artifactId>
+    <version>2.11.0</version>
+</dependency>
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>17.0</version>
+</dependency>
         <!-- This adds automatic compression of JavaScript and CSS when in production mode. -->
         <!-- 
         <dependency>

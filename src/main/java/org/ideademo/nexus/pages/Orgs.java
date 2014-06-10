@@ -19,6 +19,8 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.tapestry5.internal.TapestryInternalUtils;
+
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -36,6 +38,16 @@ import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 
 
+
+
+//semantic web
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.sparql.vocabulary.FOAF;
+import com.hp.hpl.jena.vocabulary.RDF;
+
+import org.ideademo.nexus.vocabulary.NXS;
+
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
@@ -46,11 +58,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 
 
-import org.ideademo.nexus.entities.Org;
 import org.ideademo.nexus.services.util.PDFStreamResponse;
-
-
-
 import org.ideademo.nexus.services.util.RDFStreamResponse;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -67,6 +75,8 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 
+
+import org.ideademo.nexus.entities.Org;
 
 
 import org.apache.log4j.Logger;
@@ -115,6 +125,9 @@ public class Orgs
   
   @Inject 
   HttpServletRequest request;
+  
+  @Inject
+  Messages messages;
   
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   //  Entity List generator - QBE, Text Search or Show All 
@@ -324,7 +337,7 @@ public class Orgs
   	  while(iterator.hasNext())
   	  {
   		Org org = iterator.next();
-         Model model =  org.getRDF();
+         Model model =  getModel(org);
          model.write(baos, "TURTLE", "http://www.neclimateus.org/");
   	  }
       ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -532,6 +545,237 @@ public class Orgs
       ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
       return bais;
 }
+
+  ///////////////////////////////
+  // semantic web
+	
+	   private Model getModel(Org org)
+	   {
+	       Model model = ModelFactory.createDefaultModel();
+	       
+	       Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/org/view/"+ org.getId());
+
+	       if (StringUtils.isNotBlank(org.getName())) 
+	   	   {
+	    	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(org.getName()));
+	       }
+	       else
+	       {
+	    	   model.add (resource, NXS.Name, "Organization with no Title???");
+	       }
+	       
+	       if (StringUtils.isNotBlank(org.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(org.getCode()));
+	       if (StringUtils.isNotBlank(org.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(org.getContact()));
+	       if (StringUtils.isNotBlank(org.getEmail())) model.add(resource, NXS.Email, StringUtils.trimToEmpty(org.getEmail()));
+	       if (StringUtils.isNotBlank(org.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(org.getDescription()));
+	       if (StringUtils.isNotBlank(org.getAffiliations())) model.add(resource, NXS.Affiliations, StringUtils.trimToEmpty(org.getAffiliations()));
+	       if (StringUtils.isNotBlank(org.getUrl())) model.add(resource, NXS.Homepage, StringUtils.trimToEmpty(org.getUrl()));
+	       if (StringUtils.isNotBlank(org.getLogo())) model.add(resource, NXS.Logo, StringUtils.trimToEmpty(org.getLogo()));
+	       if (StringUtils.isNotBlank(org.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(org.getWorksheet()));
+	       if (StringUtils.isNotBlank(org.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(org.getKeywords()));
+	       
+	       
+	       if (org.isFederal())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("federal"));  
+	       }
+	       else if (org.isProvince())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("province")); 
+	       }
+	       else if (org.isState())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("state")); 
+	       }
+	       else if (org.isLocal())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("local"));
+	       }
+	       else if (org.isInteragency())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("interagency")); 
+	       }
+	       else if (org.isAcademic())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("academic")); 
+	       }
+	       else if (org.isNgo())
+	       {
+	    	   model.add(resource, NXS.Organization_Type, getLabel("ngo")); 
+	       }
+	       else if (org.isOtherPartnerType())
+	       {
+	    	  model.add(resource, NXS.Organization_Type, getLabel("otherPartnerType")); 
+	       }
+	       else 
+	       {
+	    	  //model.add(resource, NXS.Organization_Type, "Unspecified"); // TODO - these should be labels or URIs
+	       }
+	       
+	      
+	       
+	       if (org.isInternational())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
+	       }
+	       else if (org.isCanada())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
+	       }
+	       else if (org.isNewBrunswick())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
+	       }
+	       else if (org.isNovaScotia())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
+	       }
+	       else if (org.isQuebec())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
+	       }
+	       else if (org.isPrinceEdwardIsland())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
+	       }
+	       else if (org.isNewfoundland())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
+	       }
+	       else if (org.isLabrador())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
+	       }
+	       else if (org.isAtlanticCanada())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
+	       }
+	       else if (org.isNational())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
+	       }
+	       else if (org.isRegionalOrState())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
+	       }
+	       else if (org.isGulfOfMaine())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
+	       }
+	       else if (org.isNewEngland())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
+	       }
+	       else if (org.isMaine())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
+	       }
+	       else if (org.isNewHampshire())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
+	       }
+	       else if (org.isMassachusetts())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
+	       }
+	       else if (org.isVermont())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
+	       }
+	       else if (org.isConnecticut())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
+	       }
+	       else if (org.isRhodeIsland())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
+	       }
+	       else if (org.isMidAtlantic())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
+	       }
+	       else if (org.isNewYork())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
+	       }
+	       else if (org.isNewJersey())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
+	       }
+	       else if (org.isPennsylvania())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
+	       }
+	       else if (org.isMarlyland())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
+	       }
+	       else if (org.isDelaware())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
+	       }
+	       else if (org.isVirginia())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
+	       }
+	       else if (org.isDistrictOfColumbia())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
+	       }
+	       else if (org.isCentral())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
+	       }
+	       else if (org.isWestVirginia())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
+	       }
+	       else if (org.isGreatLakes())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
+	       }
+	       else if (org.isOhio())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
+	       }
+	       else if (org.isSouthEast())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
+	       }
+	       else if (org.isNorthCarolina())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
+	       }
+	       else if (org.isSouthCarolina())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
+	       }
+	       else if (org.isLocalCity())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
+	       }
+	       else if (org.isProblemFocused())
+	       {
+	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
+	       }
+	       else 
+	       {
+	    	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
+	       }
+    
+	       
+	       
+	       
+	       return model;
+
+	   }	
+ 
+  private String getLabel (String varName)
+  {
+	   String key = varName + "-label";
+	   if (messages.contains(key)) return messages.get(key); 
+	   return TapestryInternalUtils.toUserPresentable(varName);
+  }
 
 
 }
