@@ -579,31 +579,31 @@ public class Orgs
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("federal"));  
 	       }
-	       else if (org.isProvince())
+	       if (org.isProvince())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("province")); 
 	       }
-	       else if (org.isState())
+	       if (org.isState())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("state")); 
 	       }
-	       else if (org.isLocal())
+	       if (org.isLocal())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("local"));
 	       }
-	       else if (org.isInteragency())
+	       if (org.isInteragency())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("interagency")); 
 	       }
-	       else if (org.isAcademic())
+	       if (org.isAcademic())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("academic")); 
 	       }
-	       else if (org.isNgo())
+	       if (org.isNgo())
 	       {
 	    	   model.add(resource, NXS.Organization_Type, getLabel("ngo")); 
 	       }
-	       else if (org.isOtherPartnerType())
+	       if (org.isOtherPartnerType())
 	       {
 	    	  model.add(resource, NXS.Organization_Type, getLabel("otherPartnerType")); 
 	       }
@@ -618,143 +618,143 @@ public class Orgs
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
 	       }
-	       else if (org.isCanada())
+	       if (org.isCanada())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
 	       }
-	       else if (org.isNewBrunswick())
+	       if (org.isNewBrunswick())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
 	       }
-	       else if (org.isNovaScotia())
+	       if (org.isNovaScotia())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
 	       }
-	       else if (org.isQuebec())
+	       if (org.isQuebec())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
 	       }
-	       else if (org.isPrinceEdwardIsland())
+	       if (org.isPrinceEdwardIsland())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
 	       }
-	       else if (org.isNewfoundland())
+	       if (org.isNewfoundland())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
 	       }
-	       else if (org.isLabrador())
+	       if (org.isLabrador())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
 	       }
-	       else if (org.isAtlanticCanada())
+	       if (org.isAtlanticCanada())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
 	       }
-	       else if (org.isNational())
+	       if (org.isNational())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
 	       }
-	       else if (org.isRegionalOrState())
+	       if (org.isRegionalOrState())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
 	       }
-	       else if (org.isGulfOfMaine())
+	       if (org.isGulfOfMaine())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
 	       }
-	       else if (org.isNewEngland())
+	       if (org.isNewEngland())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
 	       }
-	       else if (org.isMaine())
+	       if (org.isMaine())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
 	       }
-	       else if (org.isNewHampshire())
+	       if (org.isNewHampshire())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
 	       }
-	       else if (org.isMassachusetts())
+	       if (org.isMassachusetts())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
 	       }
-	       else if (org.isVermont())
+	       if (org.isVermont())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
 	       }
-	       else if (org.isConnecticut())
+	       if (org.isConnecticut())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
 	       }
-	       else if (org.isRhodeIsland())
+	       if (org.isRhodeIsland())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
 	       }
-	       else if (org.isMidAtlantic())
+	       if (org.isMidAtlantic())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
 	       }
-	       else if (org.isNewYork())
+	       if (org.isNewYork())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
 	       }
-	       else if (org.isNewJersey())
+	       if (org.isNewJersey())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
 	       }
-	       else if (org.isPennsylvania())
+	       if (org.isPennsylvania())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
 	       }
-	       else if (org.isMarlyland())
+	       if (org.isMarlyland())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
 	       }
-	       else if (org.isDelaware())
+	       if (org.isDelaware())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
 	       }
-	       else if (org.isVirginia())
+	       if (org.isVirginia())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
 	       }
-	       else if (org.isDistrictOfColumbia())
+	       if (org.isDistrictOfColumbia())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
 	       }
-	       else if (org.isCentral())
+	       if (org.isCentral())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
 	       }
-	       else if (org.isWestVirginia())
+	       if (org.isWestVirginia())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
 	       }
-	       else if (org.isGreatLakes())
+	       if (org.isGreatLakes())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
 	       }
-	       else if (org.isOhio())
+	       if (org.isOhio())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
 	       }
-	       else if (org.isSouthEast())
+	       if (org.isSouthEast())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
 	       }
-	       else if (org.isNorthCarolina())
+	       if (org.isNorthCarolina())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
 	       }
-	       else if (org.isSouthCarolina())
+	       if (org.isSouthCarolina())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
 	       }
-	       else if (org.isLocalCity())
+	       if (org.isLocalCity())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
 	       }
-	       else if (org.isProblemFocused())
+	       if (org.isProblemFocused())
 	       {
 	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
 	       }
@@ -773,8 +773,10 @@ public class Orgs
   private String getLabel (String varName)
   {
 	   String key = varName + "-label";
-	   if (messages.contains(key)) return messages.get(key); 
-	   return TapestryInternalUtils.toUserPresentable(varName);
+	   String value = "";
+	   if (messages.contains(key)) value = messages.get(key);
+	   else value = TapestryInternalUtils.toUserPresentable(varName);
+	   return StringUtils.trimToEmpty(value);
   }
 
 
