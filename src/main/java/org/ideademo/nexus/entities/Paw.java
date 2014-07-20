@@ -101,6 +101,7 @@ public class Paw implements Comparable<Paw>
 	
 	private boolean international = false;
 	private boolean canada = false;
+	private boolean atlanticCanada = false;
 	private boolean newBrunswick  = false;
 	private boolean novaScotia  = false;
 	private boolean quebec = false;
@@ -109,6 +110,7 @@ public class Paw implements Comparable<Paw>
 	private boolean labrador  = false;
 	private boolean national  = false;
 	private boolean regionalOrState  = false;
+	private boolean gulfOfMaine = false;
 	private boolean newEngland = false;
 	private boolean maine  = false;
 	private boolean newHampshire  = false;
@@ -383,6 +385,22 @@ public class Paw implements Comparable<Paw>
 	public void setConservation(boolean conservation) {
 		this.conservation = conservation;
 	}
+	
+	
+	public boolean isAtlanticCanada() {
+		return atlanticCanada;
+	}
+	public void setAtlanticCanada(boolean atlanticCanada) {
+		this.atlanticCanada = atlanticCanada;
+	}
+	public boolean isGulfOfMaine() {
+		return gulfOfMaine;
+	}
+	public void setGulfOfMaine(boolean gulfOfMaine) {
+		this.gulfOfMaine = gulfOfMaine;
+	}	
+
+	
 	public boolean isInternational() {
 		return international;
 	}

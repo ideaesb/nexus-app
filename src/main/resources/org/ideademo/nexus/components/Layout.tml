@@ -6,7 +6,7 @@
     </head>
     <body>
      <div id="mainContainer">
-       <div id="header"><img src="${context:layout/images/bluelogo.jpg}" /></div>
+       <div id="header"><t:pagelink page="home" title="Home"><img src="${context:layout/images/bluelogo.jpg}" /></t:pagelink></div>
        <t:body/>
      </div>
     </body>

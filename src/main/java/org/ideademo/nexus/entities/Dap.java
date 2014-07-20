@@ -134,6 +134,10 @@ public class Dap implements Comparable<Dap>
 	private boolean localCity  = false;
 	private boolean problemFocused = false;
 	
+	private boolean atlanticCanada = false;
+	private boolean gulfOfMaine = false;
+
+	
 	
 	/////////////////////////////////////////////
 	//Sector
@@ -661,6 +665,22 @@ public class Dap implements Comparable<Dap>
 	public void setSouthCarolina(boolean southCarolina) {
 		this.southCarolina = southCarolina;
 	}
+	
+	
+	public boolean isAtlanticCanada() {
+		return atlanticCanada;
+	}
+	public void setAtlanticCanada(boolean atlanticCanada) {
+		this.atlanticCanada = atlanticCanada;
+	}
+	public boolean isGulfOfMaine() {
+		return gulfOfMaine;
+	}
+	public void setGulfOfMaine(boolean gulfOfMaine) {
+		this.gulfOfMaine = gulfOfMaine;
+	}	
+
+	
 	public boolean isLocalCity() {
 		return localCity;
 	}

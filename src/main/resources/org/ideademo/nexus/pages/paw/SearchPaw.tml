@@ -156,8 +156,10 @@
 		<t:checkbox t:id="princeEdwardIsland" t:value="entity.princeEdwardIsland"  class="element checkbox indent2" /><t:label for="princeEdwardIsland" class="indent2" />
 		<t:checkbox t:id="newfoundland" t:value="entity.newfoundland"  class="element checkbox indent2" /><t:label for="newfoundland" class="indent2" />
 		<t:checkbox t:id="labrador" t:value="entity.labrador"  class="element checkbox indent2" /><t:label for="labrador" class="indent2" />
+		<t:checkbox t:id="atlanticCanada" t:value="entity.atlanticCanada"  class="element checkbox indent" /><t:label for="atlanticCanada" class="indent" />
 		<t:checkbox t:id="national" t:value="entity.national"  class="element checkbox" /><t:label for="national" class="choice" />
 		<t:checkbox t:id="regionalOrState" t:value="entity.regionalOrState"  class="element checkbox" /><t:label for="regionalOrState" class="choice" />
+		<t:checkbox t:id="gulfOfMaine" t:value="entity.gulfOfMaine"  class="element checkbox indent" /><t:label for="gulfOfMaine" class="indent" />
 		<t:checkbox t:id="newEngland" t:value="entity.newEngland"  class="element checkbox indent" /><t:label for="newEngland" class="indent" />
 		<t:checkbox t:id="maine" t:value="entity.maine"  class="element checkbox indent2" /><t:label for="maine" class="indent2" />
 		<t:checkbox t:id="newHampshire" t:value="entity.newHampshire"  class="element checkbox indent2" /><t:label for="newHampshire" class="indent2" />

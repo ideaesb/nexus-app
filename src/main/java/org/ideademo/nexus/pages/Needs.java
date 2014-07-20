@@ -1268,16 +1268,19 @@ public class Needs
           		
           	    // compile the "links" list
           		com.itextpdf.text.List linkz = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (need.isData()) 
+          		if (StringUtils.isNotBlank(need.getData())) 
           		{
+          			// need is of type data 
           			ListItem item = new ListItem("Data: " + need.getData());	linkz.add(item);
           		}
-          		if (need.isProducts())
+          		if (StringUtils.isNotBlank(need.getProducts())) 
           		{
+          			// type products
           			ListItem item = new ListItem("Products: " + need.getProducts());	linkz.add(item);
           		}
-          		if (need.isServices())
+          		if (StringUtils.isNotBlank(need.getServices())) 
           		{
+          			// service
           			ListItem item = new ListItem("Services: " + need.getServices());	linkz.add(item);
           		}
           		

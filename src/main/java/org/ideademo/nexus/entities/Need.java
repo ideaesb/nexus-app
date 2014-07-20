@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Parameter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.beaneditor.NonVisual;
@@ -154,6 +155,10 @@ public class Need implements Comparable<Need>
 	private boolean southCarolina  = false; 
 	private boolean localCity  = false;
 	private boolean problemFocused = false;
+	
+	private boolean atlanticCanada = false;
+	private boolean gulfOfMaine = false;
+
 	
 	
 	/////////////////////////////////////////////
@@ -417,7 +422,7 @@ public class Need implements Comparable<Need>
 		this.feedback = feedback;
 	}
 	public String getData() {
-		return data;
+		return this.data;
 	}
 	public void setData(String data) {
 		this.data = data;
@@ -530,6 +535,21 @@ public class Need implements Comparable<Need>
 	public void setConservation(boolean conservation) {
 		this.conservation = conservation;
 	}
+	
+	
+	public boolean isAtlanticCanada() {
+		return atlanticCanada;
+	}
+	public void setAtlanticCanada(boolean atlanticCanada) {
+		this.atlanticCanada = atlanticCanada;
+	}
+	public boolean isGulfOfMaine() {
+		return gulfOfMaine;
+	}
+	public void setGulfOfMaine(boolean gulfOfMaine) {
+		this.gulfOfMaine = gulfOfMaine;
+	}	
+
 	public boolean isInternational() {
 		return international;
 	}
@@ -1599,6 +1619,13 @@ public class Need implements Comparable<Need>
 		return this.unknown;
 	}
 	
+	/*
+	
+	/////////////////////////////////////////////////////////////////
+	// This will cause ambiguity in getter for these respective 
+	// fields tapestry will interpret them as boolean and therefore 
+	//  need to be "translated" into textarea.  Never do this!!!!
+	
 	public boolean isData()
 	{
 		return StringUtils.isNotBlank(this.data);
@@ -1613,7 +1640,7 @@ public class Need implements Comparable<Need>
 	{
 		return StringUtils.isNotBlank(this.services);
 	}
-	
+	*/
 	private boolean worksheetExists = false;
 	public boolean isWorksheetExists() {
 		return worksheetExists;

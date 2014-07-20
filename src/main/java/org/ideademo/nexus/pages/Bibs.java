@@ -46,8 +46,7 @@ import org.apache.tapestry5.StreamResponse;
 
 //semantic web
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.sparql.vocabulary.FOAF;
-import com.hp.hpl.jena.vocabulary.RDF;
+
 
 import org.ideademo.nexus.vocabulary.NXS; // namespaces
 

@@ -5,11 +5,11 @@
 <body id="bg4">
     <ul id="nav">
      <li><t:pagelink page="home" title="Home">Home</t:pagelink></li>
-     <li><t:pagelink page="needs" title="Needs">Needs</t:pagelink></li>
-     <li><t:pagelink page="daps" title="Data, Products &amp; Services">Data, Products &amp; Services</t:pagelink></li>
-     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Projects &amp; Activities</u></t:pagelink></li>
-     <li><t:pagelink page="orgs"  title="Organizations">Organizations</t:pagelink></li>
-     <li><t:pagelink page="bibs" title="Bibliography">Bibliography</t:pagelink></li>
+     <li><t:pagelink page="daps" title="message:dapsTip">${message:dapsTab}</t:pagelink></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName" title="message:pawsTip"><u>${message:pawsTab}</u></t:pagelink></li>
+     <li><t:pagelink page="orgs"  title="message:orgsTip">${message:orgsTab}</t:pagelink></li>
+     <li><t:pagelink page="needs" title="message:needsTip">${message:needsTab}</t:pagelink></li>
+     <li><t:pagelink page="bibs" title="message:bibsTip">${message:bibsTab}</t:pagelink></li>
     </ul>
     
 
@@ -40,16 +40,14 @@
 		
 		    <table width="750" style="border-collapse: collapse; border-spacing: 0;">
 		     <tr class="title-blue" border="1">
-		        <td  align="right" width="150">Search</td>
+		        <td  align="right" width="150">${message:searchText}</td>
 		        <td align="left">
-                   <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
+                   <input t:type="TextField" t:id="searchText" class="searchBox" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
-                   <!-- (<t:pagelink page="paw/search" target="_blank">Advanced</t:pagelink>)  -->
-                   <t:if test="loggedIn">
-                     <t:submit t:id="pdf" name="Run Report" value="Run Report" /> 
-                   </t:if>
-                 </td>
+                   <t:submit t:id="pdf" name="Run Report" value="PDF" /> 
+                   <t:submit t:id="rdf" name="RDF Dump" value="RDF" />                
+                </td>
 		      </tr>
 		    </table>
 		   </form>

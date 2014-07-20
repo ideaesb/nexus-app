@@ -42,9 +42,27 @@ public class NXS {
     public static final Property Affiliations = property( "Affiliations" );
     public static final Property Homepage = property( "Homepage" );
     public static final Property Logo = property( "Logo" );
+
     public static final Property Organization_Type = property( "Organization_Type");
     
+    // from paws
+    public static final Property Organization = property( "Organization" );
+    public static final Property Objectives = property( "Objectives" );
+    public static final Property Resources = property( "Resources" );
+    public static final Property Feedback = property( "Feedback" );
+    public static final Property Timeline = property( "Timeline" );
+    public static final Property Link = property( "Link" );
     
+    public static final Property Status = property( "Status" );
+    public static final Property Priority = property( "Priority" );
+    public static final Property Categories = property( "Categories" );
+    public static final Property Focus = property( "Focus" );
+    public static final Property Sector = property( "Sector" );
+    public static final Property Capability = property( "Capability" );
+
+    
+    
+    // general boolean groupings
     public static final Property Area_of_Applicability = property( "Area_of_Applicability"); 
 
     /**
@@ -53,6 +71,7 @@ public class NXS {
     */
     @SuppressWarnings("hiding") public static final class Nodes
         {
+    	  // bibs
           public static final Node Name = NXS.Name.asNode();
           public static final Node Description = NXS.Description.asNode();
           public static final Node Url = NXS.Url.asNode();
@@ -60,6 +79,7 @@ public class NXS {
           public static final Node Keywords = NXS.Keywords.asNode();
           public static final Node Source = NXS.Source.asNode();
           
+          //orgs
           public static final Node Acronym = NXS.Acronym.asNode();
           public static final Node Contact = NXS.Contact.asNode();
           public static final Node Email = NXS.Email.asNode();
@@ -67,6 +87,23 @@ public class NXS {
           public static final Node Homepage = NXS.Homepage.asNode();
           public static final Node Logo = NXS.Logo.asNode();
           public static final Node Organization_Type = NXS.Organization_Type.asNode();
+          
+          
+          // paws
+          public static final Node Organization = NXS.Organization.asNode();
+          public static final Node Objectives = NXS.Objectives.asNode();
+          public static final Node Resources = NXS.Resources.asNode();
+          public static final Node Feedback = NXS.Feedback.asNode();
+          public static final Node Timeline = NXS.Timeline.asNode();
+          public static final Node Link = NXS.Link.asNode();
+          
+          public static final Node Status = NXS.Status.asNode();
+          public static final Node Priority = NXS.Priority.asNode();
+          public static final Node Categories = NXS.Categories.asNode();
+          public static final Node Focus = NXS.Focus.asNode();
+          public static final Node Sector = NXS.Sector.asNode();
+          public static final Node Capability = NXS.Capability.asNode();
+          
           
           public static final Node Area_of_Applicability = NXS.Area_of_Applicability.asNode();
           

@@ -5,11 +5,11 @@
 <body id="bg6">
     <ul id="nav">
      <li><t:pagelink page="home" title="Home">Home</t:pagelink></li>
-     <li><t:pagelink page="needs" title="Needs">Needs</t:pagelink></li>
-     <li><t:pagelink page="daps" title="Data, Products &amp; Services">Data, Products &amp; Services</t:pagelink></li>
-     <li><t:pagelink page="paws" title="Projects &amp; Activities">Projects &amp; Activities</t:pagelink></li>
-     <li><t:pagelink page="orgs"  title="Organizations">Organizations</t:pagelink></li>
-     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName"><u>Bibliography</u></t:pagelink></li>
+     <li><t:pagelink page="daps" title="message:dapsTip">${message:dapsTab}</t:pagelink></li>
+     <li><t:pagelink page="paws" title="message:pawsTip">${message:pawsTab}</t:pagelink></li>
+     <li><t:pagelink page="orgs"  title="message:orgsTip">${message:orgsTab}</t:pagelink></li>
+     <li><t:pagelink page="needs" title="message:needsTip">${message:needsTab}</t:pagelink></li>
+     <li id="nav-1"><t:pagelink page="prop:componentResources.pageName" title="message:bibsTip"><u>${message:bibsTab}</u></t:pagelink></li>
     </ul>
     
 
@@ -19,9 +19,9 @@
 		 <form t:type="form" t:id="searchCriteria" action="needs" method="post">
 		    <table width="750" style="border-collapse: collapse; border-spacing: 0;">
 		     <tr class="title-blue" border="1">
-		        <td  align="right" width="150">Search</td>
+		        <td  align="right" width="150">${message:searchText}</td>
 		        <td align="left">
-                   <input t:type="TextField" t:id="searchText" size="50" value="searchText" />
+                   <input t:type="TextField" t:id="searchText" class="searchBox" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
                    <t:submit t:id="pdf" name="Run Report" value="PDF" /> 

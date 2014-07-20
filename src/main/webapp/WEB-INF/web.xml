@@ -47,6 +47,10 @@
             <security-role>
                <role-name>nexus</role-name>
            </security-role>
-    
+  <servlet>
+    <servlet-name>needs</servlet-name>
+    <servlet-class>org.apache.tapestry.ApplicationServlet</servlet-class> 
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 </web-app>
       

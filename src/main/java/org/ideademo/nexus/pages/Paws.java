@@ -20,13 +20,7 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.io.StringReader;
-import java.io.IOException;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,30 +28,25 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-
 import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.StreamResponse;
-
 import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.Persist;
 
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
-
+import org.apache.tapestry5.internal.TapestryInternalUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.Messages;
 
 
 import org.hibernate.Session;
-
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
@@ -65,6 +54,21 @@ import org.hibernate.search.query.dsl.TermMatchingContext;
 
 import org.ideademo.nexus.entities.Paw;
 import org.ideademo.nexus.services.util.PDFStreamResponse;
+import org.ideademo.nexus.services.util.RDFStreamResponse;
+
+
+
+
+
+//semantic web
+import com.hp.hpl.jena.rdf.model.*;
+
+import org.ideademo.nexus.vocabulary.NXS;
+
+
+
+
+
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -594,7 +598,29 @@ public class Paws
       return new PDFStreamResponse(is,"neXusProjectsAndActivities" + System.currentTimeMillis());
   }
 
-  
+  public StreamResponse onSelectedFromRdf() 
+  {
+      // Create PDF
+      InputStream is = getRdfStream(getList());
+      // Return response
+      return new RDFStreamResponse(is,"neXusProjectsAndActivities" + System.currentTimeMillis());
+  }
+
+
+  private InputStream getRdfStream(List list)
+  {
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  
+	  Iterator<Paw> iterator = list.iterator();
+  	  while(iterator.hasNext())
+  	  {
+  		Paw paw = iterator.next();
+         Model model =  getModel(paw);
+         model.write(baos, "TURTLE", "http://www.neclimateus.org/");
+  	  }
+      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+      return bais;
+  }
   ///////////////////////////////////////////////////////
   // private methods 
   
@@ -917,7 +943,285 @@ public class Paws
       return bais;
 }
 
+  private Model getModel(Paw paw)
+  {
+      Model model = ModelFactory.createDefaultModel();
+      
+      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/paw/view/"+ paw.getId());
+      
+      if (StringUtils.isNotBlank(paw.getName())) 
+  	   {
+   	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(paw.getName()));
+      }
+      else
+      {
+   	   model.add (resource, NXS.Name, "No Title???");
+      }
+      
+      if (StringUtils.isNotBlank(paw.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(paw.getCode()));
+      if (StringUtils.isNotBlank(paw.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(paw.getContact()));
+      //if (contact has email, as sensed by regex) model.add(resource, NXS.Email, StringUtils.trimToEmpty(paw.getEmail()));
+      if (StringUtils.isNotBlank(paw.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(paw.getDescription()));
+      if (StringUtils.isNotBlank(paw.getUrl())) model.add(resource, NXS.Link, StringUtils.trimToEmpty(paw.getUrl()));
+      if (StringUtils.isNotBlank(paw.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(paw.getWorksheet()));
+      if (StringUtils.isNotBlank(paw.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(paw.getKeywords()));
+      
+      if (StringUtils.isNotBlank(paw.getOrganization())) model.add(resource, NXS.Organization, StringUtils.trimToEmpty(paw.getOrganization()));
+      if (StringUtils.isNotBlank(paw.getObjectives())) model.add(resource, NXS.Objectives, StringUtils.trimToEmpty(paw.getObjectives()));
+      if (StringUtils.isNotBlank(paw.getDates())) model.add(resource, NXS.Timeline, StringUtils.trimToEmpty(paw.getDates()));
+      if (StringUtils.isNotBlank(paw.getResources())) model.add(resource, NXS.Resources, StringUtils.trimToEmpty(paw.getResources()));
+      if (StringUtils.isNotBlank(paw.getFeedback())) model.add(resource, NXS.Feedback, StringUtils.trimToEmpty(paw.getFeedback()));
+      
+      // status
+      if(paw.isOngoing()) model.add(resource, NXS.Status, getLabel("ongoing"));
+      if(paw.isPlanned()) model.add(resource, NXS.Status, getLabel("planned"));
+      if(paw.isProposed()) model.add(resource, NXS.Status, getLabel("proposed"));
+      if(paw.isCompleted()) model.add(resource, NXS.Status, getLabel("completed"));
+    	
+      // priority
+      if(paw.getHigh()) model.add(resource, NXS.Priority, getLabel("high"));
+      if(paw.getMid()) model.add(resource, NXS.Priority, getLabel("mid"));
+      if(paw.getLow()) model.add(resource, NXS.Priority, getLabel("low"));
+      if(paw.getUnknown()) model.add(resource, NXS.Priority, getLabel("unknown"));
+      
+      // categories
+      if(paw.isSpecific()) model.add(resource, NXS.Categories, getLabel("specific"));
+      if(paw.isRetrofitted()) model.add(resource, NXS.Categories, getLabel("retrofitted"));
+      if(paw.isMonitoring()) model.add(resource, NXS.Categories, getLabel("monitoring"));
+      if(paw.isResearch()) model.add(resource, NXS.Categories, getLabel("research"));
+      
+      // focus area
+      if(paw.isSustainability()) model.add(resource, NXS.Focus, getLabel("sustainability"));
+      if(paw.isResilience()) model.add(resource, NXS.Focus, getLabel("resilience"));
+      if(paw.isImpacts()) model.add(resource, NXS.Focus, getLabel("impacts"));
+      if(paw.isExtremes()) model.add(resource, NXS.Focus, getLabel("extremes"));
+      if(paw.isConservation()) model.add(resource, NXS.Focus, getLabel("conservation"));
+      
+      //aoa
+      if (paw.isInternational()) model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
+      if (paw.isCanada()) model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
+      if (paw.isNewBrunswick())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
+      }
+      if (paw.isNovaScotia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
+      }
+      if (paw.isQuebec())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
+      }
+      if (paw.isPrinceEdwardIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
+      }
+      if (paw.isNewfoundland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
+      }
+      if (paw.isLabrador())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
+      }
+      if (paw.isAtlanticCanada())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
+      }
+      if (paw.isNational())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
+      }
+      if (paw.isRegionalOrState())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
+      }
+      if (paw.isGulfOfMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
+      }
+      if (paw.isNewEngland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
+      }
+      if (paw.isMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
+      }
+      if (paw.isNewHampshire())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
+      }
+      if (paw.isMassachusetts())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
+      }
+      if (paw.isVermont())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
+      }
+      if (paw.isConnecticut())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
+      }
+      if (paw.isRhodeIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
+      }
+      if (paw.isMidAtlantic())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
+      }
+      if (paw.isNewYork())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
+      }
+      if (paw.isNewJersey())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
+      }
+      if (paw.isPennsylvania())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
+      }
+      if (paw.isMarlyland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
+      }
+      if (paw.isDelaware())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
+      }
+      if (paw.isVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
+      }
+      if (paw.isDistrictOfColumbia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
+      }
+      if (paw.isCentral())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
+      }
+      if (paw.isWestVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
+      }
+      if (paw.isGreatLakes())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
+      }
+      if (paw.isOhio())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
+      }
+      if (paw.isSouthEast())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
+      }
+      if (paw.isNorthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
+      }
+      if (paw.isSouthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
+      }
+      if (paw.isLocalCity())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
+      }
+      if (paw.isProblemFocused())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
+      }
+      else 
+      {
+   	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
+      }
 
+      
+      // sector
+      
+      if (paw.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (paw.isEmergencyManagement()) model.add(resource, NXS.Sector, getLabel("emergencyManagement"));  
+      if (paw.isIndirectClimateHazards()) model.add(resource, NXS.Sector, getLabel("indirectClimateHazards"));  
+      if (paw.isVectorBorneIllness()) model.add(resource, NXS.Sector, getLabel("vectorBorneIllness"));  
+      if (paw.isHeatRelated()) model.add(resource, NXS.Sector, getLabel("heatRelated"));  
+      if (paw.isWaterQuality()) model.add(resource, NXS.Sector, getLabel("waterQuality"));
+      
+      if (paw.isInfrastructure()) model.add(resource, NXS.Sector, getLabel("infrastructure"));  
+      if (paw.isEnergy()) model.add(resource, NXS.Sector, getLabel("energy"));  
+      if (paw.isCommunication()) model.add(resource, NXS.Sector, getLabel("communication"));  
+      if (paw.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (paw.isFreshWaterResources()) model.add(resource, NXS.Sector, getLabel("freshWaterResources"));  
+      if (paw.isStormWater()) model.add(resource, NXS.Sector, getLabel("stormWater"));  
+      if (paw.isWastewater()) model.add(resource, NXS.Sector, getLabel("wastewater"));
+      if (paw.isWaterSupply()) model.add(resource, NXS.Sector, getLabel("waterSupply"));  
+      if (paw.isTransportation()) model.add(resource, NXS.Sector, getLabel("transportation"));  
+      if (paw.isBuiltCoast()) model.add(resource, NXS.Sector, getLabel("builtCoast"));
+      
+      if (paw.isManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("managedEcosystems"));  
+      if (paw.isFisheries()) model.add(resource, NXS.Sector, getLabel("fisheries"));  
+      if (paw.isAquaculture()) model.add(resource, NXS.Sector, getLabel("aquaculture"));  
+      if (paw.isAgriculture()) model.add(resource, NXS.Sector, getLabel("agriculture"));  
+      if (paw.isForests()) model.add(resource, NXS.Sector, getLabel("forests"));  
+      if (paw.isOtherManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("otherManagedEcosystems"));
+      
+      if (paw.isNaturalEcosystems()) model.add(resource, NXS.Sector, getLabel("naturalEcosystems"));  
+      if (paw.isCoasts()) model.add(resource, NXS.Sector, getLabel("coasts"));  
+      if (paw.isEstuaries()) model.add(resource, NXS.Sector, getLabel("estuaries"));  
+      if (paw.isWetlands()) model.add(resource, NXS.Sector, getLabel("wetlands"));  
+      if (paw.isOceans()) model.add(resource, NXS.Sector, getLabel("oceans"));  
+      if (paw.isInland()) model.add(resource, NXS.Sector, getLabel("inland"));  
+      if (paw.isBeaches()) model.add(resource, NXS.Sector, getLabel("beaches"));  
+
+      if (paw.isBiota()) model.add(resource, NXS.Sector, getLabel("biota"));  
+      if (paw.isMarine()) model.add(resource, NXS.Sector, getLabel("marine"));  
+      if (paw.isTerrestrial()) model.add(resource, NXS.Sector, getLabel("terrestrial"));  
+      if (paw.isEndangered()) model.add(resource, NXS.Sector, getLabel("endangered"));  
+      if (paw.isCandidateSpecies()) model.add(resource, NXS.Sector, getLabel("candidateSpecies"));
+      if (paw.isConcernSpecies()) model.add(resource, NXS.Sector, getLabel("concernSpecies"));
+      
+      if (paw.isCultural()) model.add(resource, NXS.Sector, getLabel("cultural"));
+      
+      if (paw.isRecreationAndTourism()) model.add(resource, NXS.Sector, getLabel("recreationAndTourism"));
+      if (paw.isUrban()) model.add(resource, NXS.Sector, getLabel("urban"));
+      if (paw.isIndigenousPeoples()) model.add(resource, NXS.Sector, getLabel("indigenousPeoples"));
+      if (paw.isMinority()) model.add(resource, NXS.Sector, getLabel("minority"));
+      
+      if (paw.isEconomicResources()) model.add(resource, NXS.Sector, getLabel("economicResources"));
+      if (paw.isCrossDisciplinary()) model.add(resource, NXS.Sector, getLabel("crossDisciplinary"));
+      if (paw.isOtherSector()) model.add(resource, NXS.Sector, getLabel("otherSector"));
+      
+
+      if (paw.isEcv()) model.add(resource, NXS.Capability, getLabel("ecv"));
+      if (paw.isImpacts()) model.add(resource, NXS.Capability, getLabel("impacts"));      
+      if (paw.isVulnerabilityAssessments()) model.add(resource, NXS.Capability, getLabel("vulnerabilityAssessments"));
+      if (paw.isRiskAssessments()) model.add(resource, NXS.Capability, getLabel("riskAssessments"));
+      if (paw.isNeeds()) model.add(resource, NXS.Capability, getLabel("needs"));
+      
+      if (paw.isScenarioPlanning()) model.add(resource, NXS.Capability, getLabel("scenarioPlanning"));
+      if (paw.isExperimentalImpacts()) model.add(resource, NXS.Capability, getLabel("experimentalImpacts"));
+      if (paw.isMonitor()) model.add(resource, NXS.Capability, getLabel("monitor"));
+      if (paw.isDownscale()) model.add(resource, NXS.Capability, getLabel("downscale"));
+      if (paw.isConditions()) model.add(resource, NXS.Capability, getLabel("conditions"));
+      if (paw.isForecastImpacts()) model.add(resource, NXS.Capability, getLabel("forecastImpacts"));
+      if (paw.isEconomicImpacts()) model.add(resource, NXS.Capability, getLabel("economicImpacts"));
+      if (paw.isPublicSecurity()) model.add(resource, NXS.Capability, getLabel("publicSecurity"));
+      
+      if (paw.isMitigation()) model.add(resource, NXS.Capability, getLabel("mitigation"));
+      if (paw.isTranslation()) model.add(resource, NXS.Capability, getLabel("translation"));
+      if (paw.isTools()) model.add(resource, NXS.Capability, getLabel("tools"));
+      if (paw.isStakeholder()) model.add(resource, NXS.Capability, getLabel("stakeholder"));
+      if (paw.isGuidance()) model.add(resource, NXS.Capability, getLabel("guidance"));
+      if (paw.isLiteracy()) model.add(resource, NXS.Capability, getLabel("literacy"));
+      if (paw.isTranslate()) model.add(resource, NXS.Capability, getLabel("translate"));
+      if (paw.isImprove()) model.add(resource, NXS.Capability, getLabel("improve"));
+      
+      return model;
+  }
   ///////////////////////////////////////////////////////
   // private methods 
   
@@ -953,5 +1257,15 @@ public class Paws
     x.setRetrofitted(false);
     x.setMonitoring(false);
     x.setResearch(false);
+  }
+  
+  
+  private String getLabel (String varName)
+  {
+	   String key = varName + "-label";
+	   String value = "";
+	   if (messages.contains(key)) value = messages.get(key);
+	   else value = TapestryInternalUtils.toUserPresentable(varName);
+	   return StringUtils.trimToEmpty(value);
   }
 }
