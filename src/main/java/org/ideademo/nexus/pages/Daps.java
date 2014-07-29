@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.IOException;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -23,30 +22,26 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-
 import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.StreamResponse;
-
 import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.Persist;
 
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
-
+import org.apache.tapestry5.internal.TapestryInternalUtils;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.Messages;
 
 
 import org.hibernate.Session;
-
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
@@ -54,7 +49,7 @@ import org.hibernate.search.query.dsl.TermMatchingContext;
 
 import org.ideademo.nexus.entities.Dap;
 import org.ideademo.nexus.services.util.PDFStreamResponse;
-
+import org.ideademo.nexus.services.util.RDFStreamResponse;
 import org.apache.log4j.Logger;
 
 import com.itextpdf.text.BaseColor;
@@ -68,6 +63,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+//semantic web
+import com.hp.hpl.jena.rdf.model.*;
+
+import org.ideademo.nexus.vocabulary.NXS;
 
 public class Daps 
 {
@@ -820,7 +819,29 @@ public class Daps
   }
   */
   
+  public StreamResponse onSelectedFromRdf() 
+  {
+      // Create PDF
+      InputStream is = getRdfStream(getList());
+      // Return response
+      return new RDFStreamResponse(is,"neXusDataProductsServices" + System.currentTimeMillis());
+  }
 
+
+  private InputStream getRdfStream(List list)
+  {
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  
+	  Iterator<Dap> iterator = list.iterator();
+  	  while(iterator.hasNext())
+  	  {
+  	    Dap dap = iterator.next();
+            Model model =  getModel(dap);
+            model.write(baos, "TURTLE", "http://www.neclimateus.org/");
+  	  }
+          ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+          return bais;
+  }
   private InputStream getPdfTable(List list) 
   {
 
@@ -1201,7 +1222,363 @@ public class Daps
 
   ///////////////////////////////////////////////////////
   // private methods 
-  
+  private Model getModel(Dap dap)
+  {
+      Model model = ModelFactory.createDefaultModel();
+      
+      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/paw/view/"+ dap.getId());
+      
+      if (StringUtils.isNotBlank(dap.getName())) 
+  	   {
+   	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(dap.getName()));
+      }
+      else
+      {
+   	   model.add (resource, NXS.Name, "No Title???");
+      }
+      
+      if (StringUtils.isNotBlank(dap.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(dap.getCode()));
+      if (StringUtils.isNotBlank(dap.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(dap.getContact()));
+      //if (contact has email, as sensed by regex) model.add(resource, NXS.Email, StringUtils.trimToEmpty(dap.getEmail()));
+      if (StringUtils.isNotBlank(dap.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(dap.getDescription()));
+      if (StringUtils.isNotBlank(dap.getUrl())) model.add(resource, NXS.Link, StringUtils.trimToEmpty(dap.getUrl()));
+      if (StringUtils.isNotBlank(dap.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(dap.getWorksheet()));
+      if (StringUtils.isNotBlank(dap.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(dap.getKeywords()));
+      
+      if (StringUtils.isNotBlank(dap.getOrganization())) model.add(resource, NXS.Organization, StringUtils.trimToEmpty(dap.getOrganization()));
+      if (StringUtils.isNotBlank(dap.getObjectives())) model.add(resource, NXS.Objectives, StringUtils.trimToEmpty(dap.getObjectives()));
+      if (StringUtils.isNotBlank(dap.getDates())) model.add(resource, NXS.Timeline, StringUtils.trimToEmpty(dap.getDates()));
+      if (StringUtils.isNotBlank(dap.getResources())) model.add(resource, NXS.Resources, StringUtils.trimToEmpty(dap.getResources()));
+      if (StringUtils.isNotBlank(dap.getFeedback())) model.add(resource, NXS.Feedback, StringUtils.trimToEmpty(dap.getFeedback()));
+      
+      // status
+      if(dap.isOngoing()) model.add(resource, NXS.Status, getLabel("ongoing"));
+      if(dap.isPlanned()) model.add(resource, NXS.Status, getLabel("planned"));
+      if(dap.isProposed()) model.add(resource, NXS.Status, getLabel("proposed"));
+      if(dap.isCompleted()) model.add(resource, NXS.Status, getLabel("completed"));
+    	
+      // priority
+      if(dap.getHigh()) model.add(resource, NXS.Priority, getLabel("high"));
+      if(dap.getMid()) model.add(resource, NXS.Priority, getLabel("mid"));
+      if(dap.getLow()) model.add(resource, NXS.Priority, getLabel("low"));
+      if(dap.getUnknown()) model.add(resource, NXS.Priority, getLabel("unknown"));
+      
+      // focus area
+      if(dap.isSustainability()) model.add(resource, NXS.Focus, getLabel("sustainability"));
+      if(dap.isResilience()) model.add(resource, NXS.Focus, getLabel("resilience"));
+      if(dap.isImpacts()) model.add(resource, NXS.Focus, getLabel("impacts"));
+      if(dap.isExtremes()) model.add(resource, NXS.Focus, getLabel("extremes"));
+      if(dap.isConservation()) model.add(resource, NXS.Focus, getLabel("conservation"));
+      
+      //aoa
+      if (dap.isInternational()) model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
+      if (dap.isCanada()) model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
+      if (dap.isNewBrunswick())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
+      }
+      if (dap.isNovaScotia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
+      }
+      if (dap.isQuebec())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
+      }
+      if (dap.isPrinceEdwardIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
+      }
+      if (dap.isNewfoundland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
+      }
+      if (dap.isLabrador())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
+      }
+      if (dap.isAtlanticCanada())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
+      }
+      if (dap.isNational())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
+      }
+      if (dap.isRegionalOrState())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
+      }
+      if (dap.isGulfOfMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
+      }
+      if (dap.isNewEngland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
+      }
+      if (dap.isMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
+      }
+      if (dap.isNewHampshire())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
+      }
+      if (dap.isMassachusetts())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
+      }
+      if (dap.isVermont())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
+      }
+      if (dap.isConnecticut())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
+      }
+      if (dap.isRhodeIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
+      }
+      if (dap.isMidAtlantic())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
+      }
+      if (dap.isNewYork())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
+      }
+      if (dap.isNewJersey())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
+      }
+      if (dap.isPennsylvania())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
+      }
+      if (dap.isMarlyland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
+      }
+      if (dap.isDelaware())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
+      }
+      if (dap.isVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
+      }
+      if (dap.isDistrictOfColumbia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
+      }
+      if (dap.isCentral())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
+      }
+      if (dap.isWestVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
+      }
+      if (dap.isGreatLakes())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
+      }
+      if (dap.isOhio())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
+      }
+      if (dap.isSouthEast())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
+      }
+      if (dap.isNorthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
+      }
+      if (dap.isSouthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
+      }
+      if (dap.isLocalCity())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
+      }
+      if (dap.isProblemFocused())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
+      }
+      else 
+      {
+   	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
+      }
+
+      
+      // sector
+      
+      if (dap.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (dap.isEmergencyManagement()) model.add(resource, NXS.Sector, getLabel("emergencyManagement"));  
+      if (dap.isIndirectClimateHazards()) model.add(resource, NXS.Sector, getLabel("indirectClimateHazards"));  
+      if (dap.isVectorBorneIllness()) model.add(resource, NXS.Sector, getLabel("vectorBorneIllness"));  
+      if (dap.isHeatRelated()) model.add(resource, NXS.Sector, getLabel("heatRelated"));  
+      if (dap.isWaterQuality()) model.add(resource, NXS.Sector, getLabel("waterQuality"));
+      
+      if (dap.isInfrastructure()) model.add(resource, NXS.Sector, getLabel("infrastructure"));  
+      if (dap.isEnergy()) model.add(resource, NXS.Sector, getLabel("energy"));  
+      if (dap.isCommunication()) model.add(resource, NXS.Sector, getLabel("communication"));  
+      if (dap.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (dap.isFreshWaterResources()) model.add(resource, NXS.Sector, getLabel("freshWaterResources"));  
+      if (dap.isStormWater()) model.add(resource, NXS.Sector, getLabel("stormWater"));  
+      if (dap.isWastewater()) model.add(resource, NXS.Sector, getLabel("wastewater"));
+      if (dap.isWaterSupply()) model.add(resource, NXS.Sector, getLabel("waterSupply"));  
+      if (dap.isTransportation()) model.add(resource, NXS.Sector, getLabel("transportation"));  
+      if (dap.isBuiltCoast()) model.add(resource, NXS.Sector, getLabel("builtCoast"));
+      
+      if (dap.isManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("managedEcosystems"));  
+      if (dap.isFisheries()) model.add(resource, NXS.Sector, getLabel("fisheries"));  
+      if (dap.isAquaculture()) model.add(resource, NXS.Sector, getLabel("aquaculture"));  
+      if (dap.isAgriculture()) model.add(resource, NXS.Sector, getLabel("agriculture"));  
+      if (dap.isForests()) model.add(resource, NXS.Sector, getLabel("forests"));  
+      if (dap.isOtherManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("otherManagedEcosystems"));
+      
+      if (dap.isNaturalEcosystems()) model.add(resource, NXS.Sector, getLabel("naturalEcosystems"));  
+      if (dap.isCoasts()) model.add(resource, NXS.Sector, getLabel("coasts"));  
+      if (dap.isEstuaries()) model.add(resource, NXS.Sector, getLabel("estuaries"));  
+      if (dap.isWetlands()) model.add(resource, NXS.Sector, getLabel("wetlands"));  
+      if (dap.isOceans()) model.add(resource, NXS.Sector, getLabel("oceans"));  
+      if (dap.isInland()) model.add(resource, NXS.Sector, getLabel("inland"));  
+      if (dap.isBeaches()) model.add(resource, NXS.Sector, getLabel("beaches"));  
+
+      if (dap.isBiota()) model.add(resource, NXS.Sector, getLabel("biota"));  
+      if (dap.isMarine()) model.add(resource, NXS.Sector, getLabel("marine"));  
+      if (dap.isTerrestrial()) model.add(resource, NXS.Sector, getLabel("terrestrial"));  
+      if (dap.isEndangered()) model.add(resource, NXS.Sector, getLabel("endangered"));  
+      if (dap.isCandidateSpecies()) model.add(resource, NXS.Sector, getLabel("candidateSpecies"));
+      if (dap.isConcernSpecies()) model.add(resource, NXS.Sector, getLabel("concernSpecies"));
+      
+      if (dap.isCultural()) model.add(resource, NXS.Sector, getLabel("cultural"));
+      
+      if (dap.isRecreationAndTourism()) model.add(resource, NXS.Sector, getLabel("recreationAndTourism"));
+      if (dap.isUrban()) model.add(resource, NXS.Sector, getLabel("urban"));
+      if (dap.isIndigenousPeoples()) model.add(resource, NXS.Sector, getLabel("indigenousPeoples"));
+      if (dap.isMinority()) model.add(resource, NXS.Sector, getLabel("minority"));
+      
+      if (dap.isEconomicResources()) model.add(resource, NXS.Sector, getLabel("economicResources"));
+      if (dap.isCrossDisciplinary()) model.add(resource, NXS.Sector, getLabel("crossDisciplinary"));
+      if (dap.isOtherSector()) model.add(resource, NXS.Sector, getLabel("otherSector"));
+      
+
+      if (dap.isEcv()) model.add(resource, NXS.Capability, getLabel("ecv"));
+      if (dap.isImpacts()) model.add(resource, NXS.Capability, getLabel("impacts"));      
+      if (dap.isVulnerabilityAssessments()) model.add(resource, NXS.Capability, getLabel("vulnerabilityAssessments"));
+      if (dap.isRiskAssessments()) model.add(resource, NXS.Capability, getLabel("riskAssessments"));
+      if (dap.isNeeds()) model.add(resource, NXS.Capability, getLabel("needs"));
+      
+      if (dap.isScenarioPlanning()) model.add(resource, NXS.Capability, getLabel("scenarioPlanning"));
+      if (dap.isExperimentalImpacts()) model.add(resource, NXS.Capability, getLabel("experimentalImpacts"));
+      if (dap.isMonitor()) model.add(resource, NXS.Capability, getLabel("monitor"));
+      if (dap.isDownscale()) model.add(resource, NXS.Capability, getLabel("downscale"));
+      if (dap.isConditions()) model.add(resource, NXS.Capability, getLabel("conditions"));
+      if (dap.isForecastImpacts()) model.add(resource, NXS.Capability, getLabel("forecastImpacts"));
+      if (dap.isEconomicImpacts()) model.add(resource, NXS.Capability, getLabel("economicImpacts"));
+      if (dap.isPublicSecurity()) model.add(resource, NXS.Capability, getLabel("publicSecurity"));
+      
+      if (dap.isMitigation()) model.add(resource, NXS.Capability, getLabel("mitigation"));
+      if (dap.isTranslation()) model.add(resource, NXS.Capability, getLabel("translation"));
+      if (dap.isTools()) model.add(resource, NXS.Capability, getLabel("tools"));
+      if (dap.isStakeholder()) model.add(resource, NXS.Capability, getLabel("stakeholder"));
+      if (dap.isGuidance()) model.add(resource, NXS.Capability, getLabel("guidance"));
+      if (dap.isLiteracy()) model.add(resource, NXS.Capability, getLabel("literacy"));
+      if (dap.isTranslate()) model.add(resource, NXS.Capability, getLabel("translate"));
+      if (dap.isImprove()) model.add(resource, NXS.Capability, getLabel("improve"));
+      
+      // scientific discipline
+      if (dap.isPhysical()) model.add(resource, NXS.Discipline, getLabel("physical"));
+      if (dap.isAtmospheric()) model.add(resource, NXS.Discipline, getLabel("atmospheric"));
+      if (dap.isSurfaceAtmosphere()) model.add(resource, NXS.Discipline, getLabel("surfaceAtmosphere"));
+      if (dap.isUpperAir()) model.add(resource, NXS.Discipline, getLabel("upperAir"));
+      if (dap.isComposition()) model.add(resource, NXS.Discipline, getLabel("composition"));
+      if (dap.isCoastalAndOceanic()) model.add(resource, NXS.Discipline, getLabel("coastalAndOceanic"));
+      if (dap.isSurface()) model.add(resource, NXS.Discipline, getLabel("surface"));
+      if (dap.isSubSurface()) model.add(resource, NXS.Discipline, getLabel("subSurface"));
+      if (dap.isEcologicalAndBiological()) model.add(resource, NXS.Discipline, getLabel("ecologicalAndBiological"));
+      if (dap.isPopulation()) model.add(resource, NXS.Discipline, getLabel("population"));
+      if (dap.isEcosystem()) model.add(resource, NXS.Discipline, getLabel("ecosystem"));
+      if (dap.isOrganism()) model.add(resource, NXS.Discipline, getLabel("organism"));
+      if (dap.isMicrobial()) model.add(resource, NXS.Discipline, getLabel("microbial"));
+      if (dap.isOtherBiologicalOrEcological()) model.add(resource, NXS.Discipline, getLabel("otherBiologicalOrEcological"));
+      if (dap.isGeological()) model.add(resource, NXS.Discipline, getLabel("geological"));
+      if (dap.isPaleoClimate()) model.add(resource, NXS.Discipline, getLabel("paleoClimate"));
+      if (dap.isPollenCounting()) model.add(resource, NXS.Discipline, getLabel("pollenCounting"));
+      if (dap.isPorosity()) model.add(resource, NXS.Discipline, getLabel("porosity"));
+      if (dap.isOtherGeological()) model.add(resource, NXS.Discipline, getLabel("otherGeological"));
+      if (dap.isChemical()) model.add(resource, NXS.Discipline, getLabel("chemical"));
+      if (dap.isPh()) model.add(resource, NXS.Discipline, getLabel("ph"));
+      if (dap.isCarbonConcentration()) model.add(resource, NXS.Discipline, getLabel("carbonConcentration"));
+      if (dap.isOtherChemical()) model.add(resource, NXS.Discipline, getLabel("otherChemical"));
+      if (dap.isClimateSocietyInteractions()) model.add(resource, NXS.Discipline, getLabel("climateSocietyInteractions"));
+      if (dap.isSocialAndEconomic()) model.add(resource, NXS.Discipline, getLabel("socialAndEconomic"));
+      if (dap.isDecisionMaking()) model.add(resource, NXS.Discipline, getLabel("decisionMaking"));
+      if (dap.isRiskAssessmentOrRiskManagement()) model.add(resource, NXS.Discipline, getLabel("riskAssessmentOrRiskManagement"));
+      if (dap.isPolicyPlanning()) model.add(resource, NXS.Discipline, getLabel("policyPlanning"));
+      if (dap.isCommunicationAndEducation()) model.add(resource, NXS.Discipline, getLabel("communicationAndEducation"));
+      if (dap.isOtherClimateSocietyInteractions()) model.add(resource, NXS.Discipline, getLabel("otherClimateSocietyInteractions"));
+      
+      // data
+      if (dap.isInsituObservations()) model.add(resource, NXS.Data, getLabel("insituObservations"));
+      if (dap.isSatelliteRemoteObservations()) model.add(resource, NXS.Data, getLabel("satelliteRemoteObservations"));
+      if (dap.isObservingSystems()) model.add(resource, NXS.Data, getLabel("observingSystems"));
+      if (dap.isSurveysAndPreliminaryAssessments()) model.add(resource, NXS.Data, getLabel("surveysAndPreliminaryAssessments"));
+      if (dap.isIndicatorBasedResearch()) model.add(resource, NXS.Data, getLabel("indicatorBasedResearch"));
+      if (dap.isReanalysisProducts()) model.add(resource, NXS.Data, getLabel("reanalysisProducts"));
+      if (dap.isDepthAndElevationData()) model.add(resource, NXS.Data, getLabel("depthAndElevationData"));
+      if (dap.isDataStewardshipAndProvisions()) model.add(resource, NXS.Data, getLabel("dataStewardshipAndProvisions"));
+      if (dap.isOtherData()) model.add(resource, NXS.Data, getLabel("otherData"));
+      
+      // products
+      if (dap.isHindcasts()) model.add(resource, NXS.Products, getLabel("hindcasts"));
+      if (dap.isForecastsAndOutlooks()) model.add(resource, NXS.Products, getLabel("forecastsAndOutlooks"));
+      if (dap.isProjections()) model.add(resource, NXS.Products, getLabel("projections"));
+      if (dap.isMaps()) model.add(resource, NXS.Products, getLabel("maps"));
+      if (dap.isAssessments()) model.add(resource, NXS.Products, getLabel("assessments"));
+      if (dap.isAdaptationPlan()) model.add(resource, NXS.Products, getLabel("adaptationPlan"));
+      if (dap.isNeedsAssessment()) model.add(resource, NXS.Products, getLabel("needsAssessment"));
+      if (dap.isProductCapacity()) model.add(resource, NXS.Products, getLabel("productCapacity"));
+      if (dap.isProductCapabilities()) model.add(resource, NXS.Products, getLabel("productCapabilities"));
+      if (dap.isCapacity()) model.add(resource, NXS.Products, getLabel("capacity"));
+      if (dap.isCapabilities()) model.add(resource, NXS.Products, getLabel("capabilities"));
+      if (dap.isImpactStudy()) model.add(resource, NXS.Products, getLabel("impactStudy"));
+      if (dap.isRiskAndVulnerability()) model.add(resource, NXS.Products, getLabel("riskAndVulnerability"));
+      if (dap.isProblemFocused()) model.add(resource, NXS.Products, getLabel("problemFocusedProduct"));
+      if (dap.isClimateScience()) model.add(resource, NXS.Products, getLabel("climateScience"));
+      if (dap.isOtherProducts()) model.add(resource, NXS.Products, getLabel("otherProducts"));
+      
+      // services
+      if (dap.isEngagement()) model.add(resource, NXS.Services, getLabel("engagement"));
+      if (dap.isStakeholderEngagement()) model.add(resource, NXS.Services, getLabel("stakeholderEngagement"));
+      if (dap.isSectorSpecific()) model.add(resource, NXS.Services, getLabel("sectorSpecific"));
+      if (dap.isRegionSpecific()) model.add(resource, NXS.Services, getLabel("regionSpecific"));
+      if (dap.isPublicEngagement()) model.add(resource, NXS.Services, getLabel("publicEngagement"));
+      if (dap.isEducation()) model.add(resource, NXS.Services, getLabel("education"));
+      if (dap.isK12Education()) model.add(resource, NXS.Services, getLabel("k12Education"));
+      if (dap.isPublicEducation()) model.add(resource, NXS.Services, getLabel("publicEducation"));
+      if (dap.isTrainingAndCapacityBuilding()) model.add(resource, NXS.Services, getLabel("trainingAndCapacityBuilding"));
+      if (dap.isDataSupportTools()) model.add(resource, NXS.Services, getLabel("dataSupportTools"));
+      if (dap.isAdaptationAndMitigationGuidance()) model.add(resource, NXS.Services, getLabel("adaptationAndMitigationGuidance"));
+      if (dap.isViewersAndWebBasedTools()) model.add(resource, NXS.Services, getLabel("viewersAndWebBasedTools"));
+      if (dap.isMonitoringTools()) model.add(resource, NXS.Services, getLabel("monitoringTools"));
+      if (dap.isVisualizationTools()) model.add(resource, NXS.Services, getLabel("visualizationTools"));
+      if (dap.isPrioritizationTools()) model.add(resource, NXS.Services, getLabel("prioritizationTools"));
+      if (dap.isManagementGuidance()) model.add(resource, NXS.Services, getLabel("managementGuidance"));
+      if (dap.isPolicyGuidance()) model.add(resource, NXS.Services, getLabel("policyGuidance"));
+      if (dap.isOtherServices()) model.add(resource, NXS.Services, getLabel("otherServices"));
+      
+      
+      
+      return model;
+  }
+
   private void clearSectors(Dap x)
   {
       x.setPublicHealth(false);
@@ -1266,5 +1643,13 @@ public class Daps
       x.setDepthAndElevationData(false);
       x.setDataStewardshipAndProvisions(false);
       x.setOtherData(false);
+  }
+  private String getLabel (String varName)
+  {
+	   String key = varName + "-label";
+	   String value = "";
+	   if (messages.contains(key)) value = messages.get(key);
+	   else value = TapestryInternalUtils.toUserPresentable(varName);
+	   return StringUtils.trimToEmpty(value);
   }
 }

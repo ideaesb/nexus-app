@@ -63,7 +63,14 @@ public class NXS {
     
     
     // general boolean groupings
-    public static final Property Area_of_Applicability = property( "Area_of_Applicability"); 
+    public static final Property Area_of_Applicability = property( "Area_of_Applicability");
+    
+    // from daps
+    public static final Property Discipline = property( "Discipline" );
+    public static final Property Data = property( "Data" );
+    public static final Property Products = property( "Products" );
+    public static final Property Services = property( "Services" );
+    
 
     /**
         The same items of vocabulary, but at the Node level, parked inside a
@@ -106,6 +113,12 @@ public class NXS {
           
           
           public static final Node Area_of_Applicability = NXS.Area_of_Applicability.asNode();
+          
+          // daps
+          public static final Node Discipline = NXS.Discipline.asNode();
+          public static final Node Data = NXS.Data.asNode();
+          public static final Node Products = NXS.Products.asNode();
+          public static final Node Services = NXS.Services.asNode();
           
           
         }
