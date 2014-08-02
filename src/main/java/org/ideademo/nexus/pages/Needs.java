@@ -13,7 +13,10 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.StringUtils;
+
+
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -27,6 +30,7 @@ import org.apache.tapestry5.annotations.Persist;
 
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
+import org.apache.tapestry5.internal.TapestryInternalUtils;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 
@@ -41,8 +45,10 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 
 
+import org.ideademo.nexus.entities.Dap;
 import org.ideademo.nexus.entities.Need;
 import org.ideademo.nexus.services.util.PDFStreamResponse;
+import org.ideademo.nexus.services.util.RDFStreamResponse;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -56,6 +62,10 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 
+//semantic web
+import com.hp.hpl.jena.rdf.model.*;
+
+import org.ideademo.nexus.vocabulary.NXS;
 
 
 import org.apache.log4j.Logger;
@@ -819,7 +829,15 @@ public class Needs
 		  return true;
 	  }
   }
-  
+  public StreamResponse onSelectedFromRdf() 
+  {
+      // Create PDF
+      InputStream is = getRdfStream(getList());
+      // Return response
+      return new RDFStreamResponse(is,"neXusNeeds" + System.currentTimeMillis());
+  }
+
+
   public StreamResponse onSelectedFromPdf() 
   {
       // Create PDF
@@ -837,6 +855,20 @@ public class Needs
   
   
 
+  private InputStream getRdfStream(List list)
+  {
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  
+	  Iterator<Need> iterator = list.iterator();
+  	  while(iterator.hasNext())
+  	  {
+  	    Need need = iterator.next();
+            Model model =  getModel(need);
+            model.write(baos, "TURTLE", "http://www.neclimateus.org/");
+  	  }
+      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+      return bais;
+  }
  
 
   private InputStream getPdfTable(List list) 
@@ -1325,7 +1357,392 @@ public class Needs
   
   
   
-  
+  private Model getModel(Need need)
+  {
+      Model model = ModelFactory.createDefaultModel();
+      
+      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/need/view/"+ need.getId());
+      
+      if (StringUtils.isNotBlank(need.getName())) 
+      {
+   	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(need.getName()));
+      }
+      else
+      {
+   	   model.add (resource, NXS.Name, "No Title???");
+      }
+      
+      if (StringUtils.isNotBlank(need.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(need.getCode()));
+      if (StringUtils.isNotBlank(need.getOrganization())) model.add(resource, NXS.Organization, StringUtils.trimToEmpty(need.getOrganization()));
+      if (StringUtils.isNotBlank(need.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(need.getContact()));
+      //if (contact has email, as sensed by regex) model.add(resource, NXS.Email, StringUtils.trimToEmpty(need.getEmail()));
+      if (StringUtils.isNotBlank(need.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(need.getDescription()));
+      if (StringUtils.isNotBlank(need.getUrl())) model.add(resource, NXS.Link, StringUtils.trimToEmpty(need.getUrl()));
+      if (StringUtils.isNotBlank(need.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(need.getWorksheet()));
+      if (StringUtils.isNotBlank(need.getKeywords())) 
+      {
+    	  model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(need.getKeywords()));
+    	  
+    	  // get the bibliography
+    	  String [] tokens = StringUtils.split(need.getKeywords());
+    	  for (int i=0; i<tokens.length; i++)
+    	  {   
+    		  
+    		  if (tokens[i].startsWith("BIB"))
+    		  {  
+    		      /*
+    			  // get the BIB number 
+    			  int bib = NumberUtils.toInt(StringUtils.substringAfter(tokens[i], "BIB"));
+    			  Resource bibResource = ResourceFactory.createResource("http://neclimateus.org/nexus/bib/view/"+ bib);
+    			  */
+    		     Resource bibResource = ResourceFactory.createResource("http://neclimateus.org/nexus/bibs/" + tokens[i]);
+    		     model.add(resource, NXS.Bibliography, bibResource);
+    		  }
+    		  
+    	  }
+      }
+      
+      if (StringUtils.isNotBlank(need.getObjectives())) model.add(resource, NXS.Objectives, StringUtils.trimToEmpty(need.getObjectives()));
+      if (StringUtils.isNotBlank(need.getSource())) model.add(resource, NXS.Source, StringUtils.trimToEmpty(need.getSource()));
+      if (StringUtils.isNotBlank(need.getRequestor())) model.add(resource, NXS.Requestor, StringUtils.trimToEmpty(need.getRequestor()));
+      if (StringUtils.isNotBlank(need.getFeedback())) model.add(resource, NXS.Feedback, StringUtils.trimToEmpty(need.getFeedback()));
+      
+      if (StringUtils.isNotBlank(need.getData())) model.add(resource, NXS.Xdata, StringUtils.trimToEmpty(need.getData()));
+      if (StringUtils.isNotBlank(need.getProducts())) model.add(resource, NXS.Xproducts, StringUtils.trimToEmpty(need.getProducts()));
+      if (StringUtils.isNotBlank(need.getServices())) model.add(resource, NXS.Xservices, StringUtils.trimToEmpty(need.getServices()));
+      if (StringUtils.isNotBlank(need.getPrograms())) model.add(resource, NXS.Xprograms, StringUtils.trimToEmpty(need.getPrograms()));
+      if (StringUtils.isNotBlank(need.getProjects())) model.add(resource, NXS.Xprojects, StringUtils.trimToEmpty(need.getProjects()));
+      
+      if (StringUtils.isNotBlank(need.getComments())) model.add(resource, NXS.Comments, StringUtils.trimToEmpty(need.getComments()));
+      
+      // status
+      if(need.isOngoing()) model.add(resource, NXS.Status, getLabel("ongoing"));
+      if(need.isPlanned()) model.add(resource, NXS.Status, getLabel("planned"));
+      if(need.isProposed()) model.add(resource, NXS.Status, getLabel("proposed"));
+      if(need.isCompleted()) model.add(resource, NXS.Status, getLabel("completed"));
+    	
+      // priority
+      if(need.getHigh()) model.add(resource, NXS.Priority, getLabel("high"));
+      if(need.getMid()) model.add(resource, NXS.Priority, getLabel("mid"));
+      if(need.getLow()) model.add(resource, NXS.Priority, getLabel("low"));
+      if(need.getUnknown()) model.add(resource, NXS.Priority, getLabel("unknown"));
+      
+      // focus area
+      if(need.isSustainability()) model.add(resource, NXS.Focus, getLabel("sustainability"));
+      if(need.isResilience()) model.add(resource, NXS.Focus, getLabel("resilience"));
+      if(need.isImpacts()) model.add(resource, NXS.Focus, getLabel("impacts"));
+      if(need.isExtremes()) model.add(resource, NXS.Focus, getLabel("extremes"));
+      if(need.isConservation()) model.add(resource, NXS.Focus, getLabel("conservation"));
+      
+      //aoa
+      if (need.isInternational()) model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
+      if (need.isCanada()) model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
+      if (need.isNewBrunswick())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
+      }
+      if (need.isNovaScotia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
+      }
+      if (need.isQuebec())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
+      }
+      if (need.isPrinceEdwardIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
+      }
+      if (need.isNewfoundland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
+      }
+      if (need.isLabrador())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
+      }
+      if (need.isAtlanticCanada())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
+      }
+      if (need.isNational())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
+      }
+      if (need.isRegionalOrState())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
+      }
+      if (need.isGulfOfMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
+      }
+      if (need.isNewEngland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
+      }
+      if (need.isMaine())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
+      }
+      if (need.isNewHampshire())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
+      }
+      if (need.isMassachusetts())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
+      }
+      if (need.isVermont())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
+      }
+      if (need.isConnecticut())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
+      }
+      if (need.isRhodeIsland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
+      }
+      if (need.isMidAtlantic())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
+      }
+      if (need.isNewYork())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
+      }
+      if (need.isNewJersey())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
+      }
+      if (need.isPennsylvania())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
+      }
+      if (need.isMarlyland())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
+      }
+      if (need.isDelaware())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
+      }
+      if (need.isVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
+      }
+      if (need.isDistrictOfColumbia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
+      }
+      if (need.isCentral())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
+      }
+      if (need.isWestVirginia())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
+      }
+      if (need.isGreatLakes())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
+      }
+      if (need.isOhio())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
+      }
+      if (need.isSouthEast())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
+      }
+      if (need.isNorthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
+      }
+      if (need.isSouthCarolina())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
+      }
+      if (need.isLocalCity())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
+      }
+      if (need.isProblemFocused())
+      {
+   	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
+      }
+      else 
+      {
+   	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
+      }
+
+      
+      // sector
+      
+      if (need.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (need.isEmergencyManagement()) model.add(resource, NXS.Sector, getLabel("emergencyManagement"));  
+      if (need.isIndirectClimateHazards()) model.add(resource, NXS.Sector, getLabel("indirectClimateHazards"));  
+      if (need.isVectorBorneIllness()) model.add(resource, NXS.Sector, getLabel("vectorBorneIllness"));  
+      if (need.isHeatRelated()) model.add(resource, NXS.Sector, getLabel("heatRelated"));  
+      if (need.isWaterQuality()) model.add(resource, NXS.Sector, getLabel("waterQuality"));
+      
+      if (need.isInfrastructure()) model.add(resource, NXS.Sector, getLabel("infrastructure"));  
+      if (need.isEnergy()) model.add(resource, NXS.Sector, getLabel("energy"));  
+      if (need.isCommunication()) model.add(resource, NXS.Sector, getLabel("communication"));  
+      if (need.isPublicHealth()) model.add(resource, NXS.Sector, getLabel("publicHealth"));  
+      if (need.isFreshWaterResources()) model.add(resource, NXS.Sector, getLabel("freshWaterResources"));  
+      if (need.isStormWater()) model.add(resource, NXS.Sector, getLabel("stormWater"));  
+      if (need.isWastewater()) model.add(resource, NXS.Sector, getLabel("wastewater"));
+      if (need.isWaterSupply()) model.add(resource, NXS.Sector, getLabel("waterSupply"));  
+      if (need.isTransportation()) model.add(resource, NXS.Sector, getLabel("transportation"));  
+      if (need.isBuiltCoast()) model.add(resource, NXS.Sector, getLabel("builtCoast"));
+      
+      if (need.isManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("managedEcosystems"));  
+      if (need.isFisheries()) model.add(resource, NXS.Sector, getLabel("fisheries"));  
+      if (need.isAquaculture()) model.add(resource, NXS.Sector, getLabel("aquaculture"));  
+      if (need.isAgriculture()) model.add(resource, NXS.Sector, getLabel("agriculture"));  
+      if (need.isForests()) model.add(resource, NXS.Sector, getLabel("forests"));  
+      if (need.isOtherManagedEcosystems()) model.add(resource, NXS.Sector, getLabel("otherManagedEcosystems"));
+      
+      if (need.isNaturalEcosystems()) model.add(resource, NXS.Sector, getLabel("naturalEcosystems"));  
+      if (need.isCoasts()) model.add(resource, NXS.Sector, getLabel("coasts"));  
+      if (need.isEstuaries()) model.add(resource, NXS.Sector, getLabel("estuaries"));  
+      if (need.isWetlands()) model.add(resource, NXS.Sector, getLabel("wetlands"));  
+      if (need.isOceans()) model.add(resource, NXS.Sector, getLabel("oceans"));  
+      if (need.isInland()) model.add(resource, NXS.Sector, getLabel("inland"));  
+      if (need.isBeaches()) model.add(resource, NXS.Sector, getLabel("beaches"));  
+
+      if (need.isBiota()) model.add(resource, NXS.Sector, getLabel("biota"));  
+      if (need.isMarine()) model.add(resource, NXS.Sector, getLabel("marine"));  
+      if (need.isTerrestrial()) model.add(resource, NXS.Sector, getLabel("terrestrial"));  
+      if (need.isEndangered()) model.add(resource, NXS.Sector, getLabel("endangered"));  
+      if (need.isCandidateSpecies()) model.add(resource, NXS.Sector, getLabel("candidateSpecies"));
+      if (need.isConcernSpecies()) model.add(resource, NXS.Sector, getLabel("concernSpecies"));
+      
+      if (need.isCultural()) model.add(resource, NXS.Sector, getLabel("cultural"));
+      
+      if (need.isRecreationAndTourism()) model.add(resource, NXS.Sector, getLabel("recreationAndTourism"));
+      if (need.isUrban()) model.add(resource, NXS.Sector, getLabel("urban"));
+      if (need.isIndigenousPeoples()) model.add(resource, NXS.Sector, getLabel("indigenousPeoples"));
+      if (need.isMinority()) model.add(resource, NXS.Sector, getLabel("minority"));
+      
+      if (need.isEconomicResources()) model.add(resource, NXS.Sector, getLabel("economicResources"));
+      if (need.isCrossDisciplinary()) model.add(resource, NXS.Sector, getLabel("crossDisciplinary"));
+      if (need.isOtherSector()) model.add(resource, NXS.Sector, getLabel("otherSector"));
+      
+
+      if (need.isEcv()) model.add(resource, NXS.Capability, getLabel("ecv"));
+      if (need.isImpacts()) model.add(resource, NXS.Capability, getLabel("impacts"));      
+      if (need.isVulnerabilityAssessments()) model.add(resource, NXS.Capability, getLabel("vulnerabilityAssessments"));
+      if (need.isRiskAssessments()) model.add(resource, NXS.Capability, getLabel("riskAssessments"));
+      if (need.isNeeds()) model.add(resource, NXS.Capability, getLabel("needs"));
+      
+      if (need.isScenarioPlanning()) model.add(resource, NXS.Capability, getLabel("scenarioPlanning"));
+      if (need.isExperimentalImpacts()) model.add(resource, NXS.Capability, getLabel("experimentalImpacts"));
+      if (need.isMonitor()) model.add(resource, NXS.Capability, getLabel("monitor"));
+      if (need.isDownscale()) model.add(resource, NXS.Capability, getLabel("downscale"));
+      if (need.isConditions()) model.add(resource, NXS.Capability, getLabel("conditions"));
+      if (need.isForecastImpacts()) model.add(resource, NXS.Capability, getLabel("forecastImpacts"));
+      if (need.isEconomicImpacts()) model.add(resource, NXS.Capability, getLabel("economicImpacts"));
+      if (need.isPublicSecurity()) model.add(resource, NXS.Capability, getLabel("publicSecurity"));
+      
+      if (need.isMitigation()) model.add(resource, NXS.Capability, getLabel("mitigation"));
+      if (need.isTranslation()) model.add(resource, NXS.Capability, getLabel("translation"));
+      if (need.isTools()) model.add(resource, NXS.Capability, getLabel("tools"));
+      if (need.isStakeholder()) model.add(resource, NXS.Capability, getLabel("stakeholder"));
+      if (need.isGuidance()) model.add(resource, NXS.Capability, getLabel("guidance"));
+      if (need.isLiteracy()) model.add(resource, NXS.Capability, getLabel("literacy"));
+      if (need.isTranslate()) model.add(resource, NXS.Capability, getLabel("translate"));
+      if (need.isImprove()) model.add(resource, NXS.Capability, getLabel("improve"));
+      
+      // scientific discipline
+      if (need.isPhysical()) model.add(resource, NXS.Discipline, getLabel("physical"));
+      if (need.isAtmospheric()) model.add(resource, NXS.Discipline, getLabel("atmospheric"));
+      if (need.isSurfaceAtmosphere()) model.add(resource, NXS.Discipline, getLabel("surfaceAtmosphere"));
+      if (need.isUpperAir()) model.add(resource, NXS.Discipline, getLabel("upperAir"));
+      if (need.isComposition()) model.add(resource, NXS.Discipline, getLabel("composition"));
+      if (need.isCoastalAndOceanic()) model.add(resource, NXS.Discipline, getLabel("coastalAndOceanic"));
+      if (need.isSurface()) model.add(resource, NXS.Discipline, getLabel("surface"));
+      if (need.isSubSurface()) model.add(resource, NXS.Discipline, getLabel("subSurface"));
+      if (need.isEcologicalAndBiological()) model.add(resource, NXS.Discipline, getLabel("ecologicalAndBiological"));
+      if (need.isPopulation()) model.add(resource, NXS.Discipline, getLabel("population"));
+      if (need.isEcosystem()) model.add(resource, NXS.Discipline, getLabel("ecosystem"));
+      if (need.isOrganism()) model.add(resource, NXS.Discipline, getLabel("organism"));
+      if (need.isMicrobial()) model.add(resource, NXS.Discipline, getLabel("microbial"));
+      if (need.isOtherBiologicalOrEcological()) model.add(resource, NXS.Discipline, getLabel("otherBiologicalOrEcological"));
+      if (need.isGeological()) model.add(resource, NXS.Discipline, getLabel("geological"));
+      if (need.isPaleoClimate()) model.add(resource, NXS.Discipline, getLabel("paleoClimate"));
+      if (need.isPollenCounting()) model.add(resource, NXS.Discipline, getLabel("pollenCounting"));
+      if (need.isPorosity()) model.add(resource, NXS.Discipline, getLabel("porosity"));
+      if (need.isOtherGeological()) model.add(resource, NXS.Discipline, getLabel("otherGeological"));
+      if (need.isChemical()) model.add(resource, NXS.Discipline, getLabel("chemical"));
+      if (need.isPh()) model.add(resource, NXS.Discipline, getLabel("ph"));
+      if (need.isCarbonConcentration()) model.add(resource, NXS.Discipline, getLabel("carbonConcentration"));
+      if (need.isOtherChemical()) model.add(resource, NXS.Discipline, getLabel("otherChemical"));
+      if (need.isClimateSocietyInteractions()) model.add(resource, NXS.Discipline, getLabel("climateSocietyInteractions"));
+      if (need.isSocialAndEconomic()) model.add(resource, NXS.Discipline, getLabel("socialAndEconomic"));
+      if (need.isDecisionMaking()) model.add(resource, NXS.Discipline, getLabel("decisionMaking"));
+      if (need.isRiskAssessmentOrRiskManagement()) model.add(resource, NXS.Discipline, getLabel("riskAssessmentOrRiskManagement"));
+      if (need.isPolicyPlanning()) model.add(resource, NXS.Discipline, getLabel("policyPlanning"));
+      if (need.isCommunicationAndEducation()) model.add(resource, NXS.Discipline, getLabel("communicationAndEducation"));
+      if (need.isOtherClimateSocietyInteractions()) model.add(resource, NXS.Discipline, getLabel("otherClimateSocietyInteractions"));
+      
+      // data
+      if (need.isInsituObservations()) model.add(resource, NXS.Data, getLabel("insituObservations"));
+      if (need.isSatelliteRemoteObservations()) model.add(resource, NXS.Data, getLabel("satelliteRemoteObservations"));
+      if (need.isObservingSystems()) model.add(resource, NXS.Data, getLabel("observingSystems"));
+      if (need.isSurveysAndPreliminaryAssessments()) model.add(resource, NXS.Data, getLabel("surveysAndPreliminaryAssessments"));
+      if (need.isIndicatorBasedResearch()) model.add(resource, NXS.Data, getLabel("indicatorBasedResearch"));
+      if (need.isReanalysisProducts()) model.add(resource, NXS.Data, getLabel("reanalysisProducts"));
+      if (need.isDepthAndElevationData()) model.add(resource, NXS.Data, getLabel("depthAndElevationData"));
+      if (need.isDataStewardshipAndProvisions()) model.add(resource, NXS.Data, getLabel("dataStewardshipAndProvisions"));
+      if (need.isOtherData()) model.add(resource, NXS.Data, getLabel("otherData"));
+      
+      // products
+      if (need.isHindcasts()) model.add(resource, NXS.Products, getLabel("hindcasts"));
+      if (need.isForecastsAndOutlooks()) model.add(resource, NXS.Products, getLabel("forecastsAndOutlooks"));
+      if (need.isProjections()) model.add(resource, NXS.Products, getLabel("projections"));
+      if (need.isMaps()) model.add(resource, NXS.Products, getLabel("maps"));
+      if (need.isAssessments()) model.add(resource, NXS.Products, getLabel("assessments"));
+      if (need.isAdaptationPlan()) model.add(resource, NXS.Products, getLabel("adaptationPlan"));
+      if (need.isNeedsAssessment()) model.add(resource, NXS.Products, getLabel("needsAssessment"));
+      if (need.isProductCapacity()) model.add(resource, NXS.Products, getLabel("productCapacity"));
+      if (need.isProductCapabilities()) model.add(resource, NXS.Products, getLabel("productCapabilities"));
+      if (need.isCapacity()) model.add(resource, NXS.Products, getLabel("capacity"));
+      if (need.isCapabilities()) model.add(resource, NXS.Products, getLabel("capabilities"));
+      if (need.isImpactStudy()) model.add(resource, NXS.Products, getLabel("impactStudy"));
+      if (need.isRiskAndVulnerability()) model.add(resource, NXS.Products, getLabel("riskAndVulnerability"));
+      if (need.isProblemFocused()) model.add(resource, NXS.Products, getLabel("problemFocusedProduct"));
+      if (need.isClimateScience()) model.add(resource, NXS.Products, getLabel("climateScience"));
+      if (need.isOtherProducts()) model.add(resource, NXS.Products, getLabel("otherProducts"));
+      
+      // services
+      if (need.isEngagement()) model.add(resource, NXS.Services, getLabel("engagement"));
+      if (need.isStakeholderEngagement()) model.add(resource, NXS.Services, getLabel("stakeholderEngagement"));
+      if (need.isSectorSpecific()) model.add(resource, NXS.Services, getLabel("sectorSpecific"));
+      if (need.isRegionSpecific()) model.add(resource, NXS.Services, getLabel("regionSpecific"));
+      if (need.isPublicEngagement()) model.add(resource, NXS.Services, getLabel("publicEngagement"));
+      if (need.isEducation()) model.add(resource, NXS.Services, getLabel("education"));
+      if (need.isK12Education()) model.add(resource, NXS.Services, getLabel("k12Education"));
+      if (need.isPublicEducation()) model.add(resource, NXS.Services, getLabel("publicEducation"));
+      if (need.isTrainingAndCapacityBuilding()) model.add(resource, NXS.Services, getLabel("trainingAndCapacityBuilding"));
+      if (need.isDataSupportTools()) model.add(resource, NXS.Services, getLabel("dataSupportTools"));
+      if (need.isAdaptationAndMitigationGuidance()) model.add(resource, NXS.Services, getLabel("adaptationAndMitigationGuidance"));
+      if (need.isViewersAndWebBasedTools()) model.add(resource, NXS.Services, getLabel("viewersAndWebBasedTools"));
+      if (need.isMonitoringTools()) model.add(resource, NXS.Services, getLabel("monitoringTools"));
+      if (need.isVisualizationTools()) model.add(resource, NXS.Services, getLabel("visualizationTools"));
+      if (need.isPrioritizationTools()) model.add(resource, NXS.Services, getLabel("prioritizationTools"));
+      if (need.isManagementGuidance()) model.add(resource, NXS.Services, getLabel("managementGuidance"));
+      if (need.isPolicyGuidance()) model.add(resource, NXS.Services, getLabel("policyGuidance"));
+      if (need.isOtherServices()) model.add(resource, NXS.Services, getLabel("otherServices"));
+      
+      
+      
+      return model;
+  }
+
   
   private void clearSectors(Need x)
   {
@@ -1391,5 +1808,13 @@ public class Needs
       x.setDepthAndElevationData(false);
       x.setDataStewardshipAndProvisions(false);
       x.setOtherData(false);
+  }
+  private String getLabel (String varName)
+  {
+	   String key = varName + "-label";
+	   String value = "";
+	   if (messages.contains(key)) value = messages.get(key);
+	   else value = TapestryInternalUtils.toUserPresentable(varName);
+	   return StringUtils.trimToEmpty(value);
   }
 }

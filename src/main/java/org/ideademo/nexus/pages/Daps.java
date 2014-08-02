@@ -1226,7 +1226,7 @@ public class Daps
   {
       Model model = ModelFactory.createDefaultModel();
       
-      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/paw/view/"+ dap.getId());
+      Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/dap/view/"+ dap.getId());
       
       if (StringUtils.isNotBlank(dap.getName())) 
   	   {

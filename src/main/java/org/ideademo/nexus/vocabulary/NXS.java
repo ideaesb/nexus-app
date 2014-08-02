@@ -71,6 +71,18 @@ public class NXS {
     public static final Property Products = property( "Products" );
     public static final Property Services = property( "Services" );
     
+    //needs
+    public static final Property Comments  = property( "Comments" );
+    public static final Property Requestor = property( "Requestor" );
+    public static final Property Bibliography  = property( "Bibliography" );
+    
+    public static final Property Xdata     = property( "Existing_Data_Related_to_Need" );
+    public static final Property Xproducts = property( "Existing_Products_Related_to_Need" );
+    public static final Property Xservices = property( "Existing_Services_Related_to_Need" );
+    public static final Property Xprograms = property( "Existing_Programs_Related_to_Need" );
+    public static final Property Xprojects = property( "Existing_Projects_Related_to_Need" );
+    
+    
 
     /**
         The same items of vocabulary, but at the Node level, parked inside a
@@ -119,6 +131,17 @@ public class NXS {
           public static final Node Data = NXS.Data.asNode();
           public static final Node Products = NXS.Products.asNode();
           public static final Node Services = NXS.Services.asNode();
+          
+          // needs
+          public static final Node Requestor     = NXS.Requestor.asNode();
+          public static final Node Comments      = NXS.Comments.asNode();
+          public static final Node Bibliography  = NXS.Bibliography.asNode();
+          
+          public static final Node Xdata     = NXS.Xdata.asNode();
+          public static final Node Xproducts = NXS.Xproducts.asNode();
+          public static final Node Xservices = NXS.Xservices.asNode();
+          public static final Node Xprograms = NXS.Xprograms.asNode();
+          public static final Node Xprojects = NXS.Xprojects.asNode();
           
           
         }

@@ -28,7 +28,7 @@
         <filter-name>app</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
+    <!-- 
               <security-constraint>
                 <web-resource-collection>
                       <web-resource-name>Login</web-resource-name>
@@ -47,10 +47,11 @@
             <security-role>
                <role-name>nexus</role-name>
            </security-role>
+      
   <servlet>
     <servlet-name>needs</servlet-name>
     <servlet-class>org.apache.tapestry.ApplicationServlet</servlet-class> 
     <load-on-startup>1</load-on-startup>
-  </servlet>
+  </servlet -->
 </web-app>
       
