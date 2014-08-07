@@ -88,7 +88,7 @@ public class Bibs
   
   /////////////////////////////
   //  Drives QBE Search
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Bib example;
   
   
@@ -100,7 +100,7 @@ public class Bibs
 
   @PageActivationContext
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private String searchText;
 
   @Inject
@@ -110,10 +110,10 @@ public class Bibs
   private HibernateSessionManager sessionManager;
 
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int retrieved; 
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int total;
   @Inject
   @Path("context:layout/images/noaa-logo.png")
@@ -373,18 +373,68 @@ public class Bibs
   
   public StreamResponse onSelectedFromPdf() 
   {
-      // Create PDF
-      InputStream is = getPdfTable(getList());
-      // Return response
-      return new PDFStreamResponse(is,"neXusCitations" + System.currentTimeMillis());
+	 List<Bib> list = getList();
+     String subheader = "Printing " + retrieved + " of total " + total + " records.";
+     if (StringUtils.isNotBlank(searchText))
+     {
+   	  subheader += "  Searching for \"" + searchText + "\""; 
+     }
+     Document document = new Document();
+     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+     try
+     {
+    	 PdfWriter writer = PdfWriter.getInstance(document, baos);
+         document.open();
+         document.add(getLogo());
+         document.add(new Paragraph(getHeader("NExUS Citations ")));
+         document.add(new Paragraph(subheader));
+         document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+         Iterator<Bib> iterator = list.iterator();
+         while (iterator.hasNext())
+         {
+        	 Bib b = iterator.next();
+        	 document.add(getPDFTable(b));
+        	 document.add(Chunk.NEWLINE);
+         }
+         document.close();
+     }
+     catch (Exception e)
+     {
+   	  logger.warn("Error generating PDF Doc " + e);
+     }
+     return getResponse ("NExUS_Citations", baos);
   }
+  public StreamResponse onReturnStreamResponse(long id) 
+  {
+      Document document = new Document();
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+      try
+      {
+    	  PdfWriter writer = PdfWriter.getInstance(document, baos);
+          document.open();
+          document.add(getLogo());
+          document.add(new Paragraph(getHeader("NExUS Citation ")));
+          document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+          Bib b =  (Bib) session.load(Bib.class, id);
+          document.add(getPDFTable(b));
+          document.close();
+      }
+      catch (Exception e)
+      {
+    	  logger.warn("Error generating PDF Doc " + e);
+      }
+
+      return getResponse ("NExUS_Citation", baos);
+  }	  
+  
 
   public StreamResponse onSelectedFromRdf() 
   {
       // Create PDF
       InputStream is = getRdfStream(getList());
       // Return response
-      return new RDFStreamResponse(is,"neXusCitations" + System.currentTimeMillis());
+      return new RDFStreamResponse(is,"NExUS_Citations_" + System.currentTimeMillis());
   }
 
   /*
@@ -412,103 +462,6 @@ public class Bibs
       return bais;
   }
   
-  private InputStream getPdfTable(List list) 
-  {
-
-      // step 1: creation of a document-object
-      Document document = new Document();
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-      try {
-              // step 2:
-              // we create a writer that listens to the document
-              // and directs a PDF-stream to a file
-              PdfWriter writer = PdfWriter.getInstance(document, baos);
-              // step 3: we open the document
-              document.open();
-              
-              java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
-              if (awtImage != null)
-              {
-            	  com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null); 
-            	  if (logo != null) document.add(logo);
-              }
-              
-              
-              
-              DateFormat formatter = new SimpleDateFormat
-                      ("EEE MMM dd HH:mm:ss zzz yyyy");
-                  Date date = new Date(System.currentTimeMillis());
-                  TimeZone eastern = TimeZone.getTimeZone("America/New_York");
-                  formatter.setTimeZone(eastern);
-
-              document.add(new Paragraph("NEClimateUS.org Bibliography Report " + formatter.format(date)));
-              
-              String subheader = "Printing " + retrieved + " of total " + total + " records.";
-              if (StringUtils.isNotBlank(searchText))
-              {
-            	  subheader += "  Searching for \"" + searchText + "\""; 
-              }
-              
-              document.add(new Paragraph(subheader));
-              document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
-              
-              // create table, 2 columns
-           	Iterator<Bib> iterator = list.iterator();
-           	int count=0;
-       		while(iterator.hasNext())
-      		{
-       			count++;
-          		Bib bib = iterator.next();
-          		
-          		String name = bib.getName();
-          		String description = bib.getDescription();
-          		String url = bib.getUrl();
-          		
-                PdfPTable table = new PdfPTable(2);
-                table.setWidths(new int[]{1, 4});
-                table.setSplitRows(false);
-                
-                
- 	
-                
-                
-                PdfPCell nameTitle = new PdfPCell(new Phrase("#" + count + ") Citation")); 
-                PdfPCell nameCell = new PdfPCell(new Phrase(name));
-                
-                nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                
-                table.addCell(nameTitle);  table.addCell(nameCell);          		          		
-          		
-          		if (StringUtils.isNotBlank(description))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
-          		}
-          		if (StringUtils.isNotBlank(url))
-          		{
-            	  Anchor link = new Anchor(StringUtils.trimToEmpty(url)); link.setReference(StringUtils.trimToEmpty(url));
-          		  table.addCell(new PdfPCell(new Phrase("Url")));  table.addCell(new PdfPCell(link));
-          		}
-          		document.add(table);
-          		document.add(Chunk.NEWLINE);
-      		}
-              
-              
-      } catch (DocumentException de) {
-              logger.fatal(de.getMessage());
-      }
-      catch (IOException ie)
-      {
-    	 logger.warn("Could not find NOAA logo (likely)");
-    	 logger.warn(ie);
-      }
-
-      // step 5: we close the document
-      document.close();
-      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-      return bais;
-}
   
   // create RDF graph element (bunch of triples )
   private Model getModel(Bib bib)
@@ -535,5 +488,77 @@ public class Bibs
 
   }
 
+  private PdfPTable getPDFTable(Bib bib)
+  {
+      // create table, 2 columns
+        PdfPTable table = new PdfPTable(2);
+        try
+        {
+          table.setWidths(new int[]{1, 4});
+        }
+        catch (Exception e)
+        {
+      	  logger.fatal("Could not setWidths???" + e );
+        }
+        table.setSplitRows(false);
+  		String name = bib.getName();
+  		String description = bib.getDescription();
+  		String url = bib.getUrl();
+        
+        
+        PdfPCell nameTitle = new PdfPCell(new Phrase("Citation")); 
+        PdfPCell nameCell = new PdfPCell(new Phrase(name));
+        
+        nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        
+        table.addCell(nameTitle);  table.addCell(nameCell);          		          		
+  		
+  		if (StringUtils.isNotBlank(description))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
+  		}
+  		if (StringUtils.isNotBlank(url))
+  		{
+    	  Anchor link = new Anchor(StringUtils.trimToEmpty(url)); link.setReference(StringUtils.trimToEmpty(url));
+  		  table.addCell(new PdfPCell(new Phrase("Url")));  table.addCell(new PdfPCell(link));
+  		}
+     return table; 
+  }
+ 
 
+  private com.itextpdf.text.Image getLogo()
+   {
+     java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
+ 	  try
+ 	  {
+	    com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null);
+	    logo.scalePercent(50);
+	    return logo;
+ 	  }
+ 	  catch (Exception e)
+ 	  {
+ 		 logger.warn("Could not generate logo " + e);
+ 	  }
+	  
+      return null;
+   }
+   private String getHeader(String prefix)
+   {
+	      DateFormat formatter = new SimpleDateFormat
+                  ("EEE MMM dd HH:mm:ss zzz yyyy");
+              Date date = new Date(System.currentTimeMillis());
+              TimeZone eastern = TimeZone.getTimeZone("Pacific/Honolulu");
+              formatter.setTimeZone(eastern);
+              
+      return prefix + formatter.format(date); 
+   }
+   
+   private PDFStreamResponse getResponse (String prefix, ByteArrayOutputStream baos)
+   {
+     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+     DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy.HH.mm.ss.zzz");
+     return new PDFStreamResponse(bais, prefix + "_generated_on_" + formatter.format(new Date(System.currentTimeMillis())));
+     //return new PDFStreamResponse(bais, prefix);
+   }
+  
 }

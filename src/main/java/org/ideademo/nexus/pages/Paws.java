@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -60,10 +61,12 @@ import org.ideademo.nexus.services.util.RDFStreamResponse;
 
 
 
+
 //semantic web
 import com.hp.hpl.jena.rdf.model.*;
 
 import org.ideademo.nexus.vocabulary.NXS;
+
 
 
 
@@ -93,7 +96,7 @@ public class Paws
   
   /////////////////////////////
   //  Drives QBE Search
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Paw example;
   
   
@@ -105,7 +108,7 @@ public class Paws
 
     
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private String searchText;
 
   @Inject
@@ -115,10 +118,10 @@ public class Paws
   private HibernateSessionManager sessionManager;
   
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int retrieved; 
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int total;
   @Inject
   private Messages messages;
@@ -135,7 +138,7 @@ public class Paws
   
   // the scientific discipline select box
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Category category; 
   /**
    * SPECIFIC=Climate-change Specific Projects
@@ -151,7 +154,7 @@ public class Paws
   
   // the sector select box
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Sector sector; 
   /**
    * PUBLIC=Public Health and Safety
@@ -172,7 +175,7 @@ public class Paws
 
   
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Regions regions;  // AOA = Area of Applicability
   /**
    *  INT=International
@@ -592,11 +595,90 @@ public class Paws
   }
   public StreamResponse onSelectedFromPdf() 
   {
-      // Create PDF
-      InputStream is = getPdfTable(getList());
-      // Return response
-      return new PDFStreamResponse(is,"neXusProjectsAndActivities" + System.currentTimeMillis());
-  }
+     List<Paw> list = getList();
+     String subheader = "Printing " + retrieved + " of total " + total + " records.";
+     if (StringUtils.isNotBlank(searchText))
+     {
+    	  subheader += "  Searching for \"" + searchText + "\""; 
+     }
+     
+     
+     Document document = new Document();
+     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+     try
+     {
+         PdfWriter writer = PdfWriter.getInstance(document, baos);
+         document.open();
+         document.add(getLogo());
+         document.add(new Paragraph(getHeader("NExUS Ongoing Projects and Activities ")));
+         document.add(new Paragraph(subheader));
+         
+         // drop-downs, 
+         if (category != null)
+         {
+       	  document.add(new Paragraph("Category: " + messages.get(category.toString())));
+         }
+         else
+         {
+       	  document.add(new Paragraph("Category: All"));
+         }
+
+         if (sector != null)
+         {
+       	  document.add(new Paragraph("Sector: " + messages.get(sector.toString())));
+         }
+         else
+         {
+       	  document.add(new Paragraph("Sector: All"));
+         }
+
+         if (regions != null)
+         {
+       	  document.add(new Paragraph("Area of Applicability: " + messages.get(regions.toString())));
+         }
+         else
+         {
+       	  document.add(new Paragraph("Area of Applicability: All"));
+         }
+         
+         document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+         Iterator<Paw> iterator = list.iterator();
+         while (iterator.hasNext())
+         {
+        	 Paw p = iterator.next();
+        	 document.add(getPDFTable(p));
+        	 document.add(Chunk.NEWLINE);
+         }
+         document.close();
+     }
+     catch (Exception e)
+     {
+   	  logger.warn("Error generating PDF Doc " + e);
+     }
+     return getResponse ("NExUS_Projects_Activities", baos);  
+   }
+
+  public StreamResponse onReturnStreamResponse(long id) 
+  {
+      Document document = new Document();
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      try
+      {
+          PdfWriter writer = PdfWriter.getInstance(document, baos);
+          document.open();
+          document.add(getLogo());
+          document.add(new Paragraph(getHeader("NExUS Ongoing Projects and Activities ")));
+          document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+          Paw p =  (Paw) session.load(Paw.class, id);
+          document.add(getPDFTable(p));
+          document.close();
+      }
+      catch (Exception e)
+      {
+    	  logger.warn("Error generating PDF Doc " + e);
+      }
+     return getResponse ("NExUS_Projects_Activities", baos);  
+  }	  
 
   public StreamResponse onSelectedFromRdf() 
   {
@@ -628,320 +710,6 @@ public class Paws
 
  
 
-  private InputStream getPdfTable(List list) 
-  {
-
-      // step 1: creation of a document-object
-      Document document = new Document();
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-      try {
-              // step 2:
-              // we create a writer that listens to the document
-              // and directs a PDF-stream to a file
-              PdfWriter writer = PdfWriter.getInstance(document, baos);
-              // step 3: we open the document
-              document.open();
-              java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
-              if (awtImage != null)
-              {
-            	  com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null); 
-            	  if (logo != null) document.add(logo);
-              }
-
-              DateFormat formatter = new SimpleDateFormat
-                      ("EEE MMM dd HH:mm:ss zzz yyyy");
-                  Date date = new Date(System.currentTimeMillis());
-                  TimeZone eastern = TimeZone.getTimeZone("America/New_York");
-                  formatter.setTimeZone(eastern);
-
-              document.add(new Paragraph("NEClimateUS.org Projects & Activties Report " + formatter.format(date)));
-
-              
-              String subheader = "Printing " + retrieved + " of total " + total + " records.";
-              if (StringUtils.isNotBlank(searchText))
-              {
-            	  subheader += "  Searching for \"" + searchText + "\""; 
-              }
-              
-              document.add(new Paragraph(subheader));
-              
-              
-              // drop-downs, 
-              if (category != null)
-              {
-            	  document.add(new Paragraph("Category: " + messages.get(category.toString())));
-              }
-              else
-              {
-            	  document.add(new Paragraph("Category: All"));
-              }
-
-              if (sector != null)
-              {
-            	  document.add(new Paragraph("Sector: " + messages.get(sector.toString())));
-              }
-              else
-              {
-            	  document.add(new Paragraph("Sector: All"));
-              }
-
-              if (regions != null)
-              {
-            	  document.add(new Paragraph("Area of Applicability: " + messages.get(regions.toString())));
-              }
-              else
-              {
-            	  document.add(new Paragraph("Area of Applicability: All"));
-              }
-
-              
-              document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
-              
-              // create table, 2 columns
-           	Iterator<Paw> iterator = list.iterator();
-           	int count=0;
-       		while(iterator.hasNext())
-      		{
-       			count++;
-          		Paw paw = iterator.next();
-          		
-          		String name = paw.getName();
-          		String description = paw.getDescription();
-          		
-                PdfPTable table = new PdfPTable(2);
-                table.setWidths(new int[]{1, 4});
-                //table.setSplitRows(false);
-          	
-                
-                
-                PdfPCell nameTitle = new PdfPCell(new Phrase("#" + count + ") Name")); 
-                PdfPCell nameCell = new PdfPCell(new Phrase(name));
-                
-                nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                
-                table.addCell(nameTitle);  table.addCell(nameCell);
-          		if (StringUtils.isNotBlank(description))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
-          		}
-          		
-          		
-          	    // compile the categories list
-          		com.itextpdf.text.List categories = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (paw.isSpecific()) 
-          		{
-          			ListItem item = new ListItem(messages.get("SPECIFIC"));	categories.add(item);
-          		}
-          		if (paw.isRetrofitted()) 
-          		{
-          			ListItem item = new ListItem(messages.get("RETRO"));	categories.add(item);
-          		}
-          		if (paw.isMonitoring()) 
-          		{
-          			ListItem item = new ListItem(messages.get("MONITOR"));	categories.add(item);
-          		}
-          		if (paw.isResearch()) 
-          		{
-          			ListItem item = new ListItem(messages.get("RESEARCH"));	categories.add(item);
-          		}
-          		if(categories.size() > 0)
-          		{
-            		  PdfPCell catCell = new PdfPCell(); catCell.addElement(categories);
-              		  table.addCell(new PdfPCell(new Phrase("Category"))); table.addCell(catCell);
-          		}
-          		
-          	    // compile the sectors list
-          		com.itextpdf.text.List sectors = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (paw.isPublicHealth()) 
-          		{
-          			ListItem item = new ListItem(messages.get("PUBLIC"));	sectors.add(item);
-          		}
-          		if (paw.isInfrastructure()) 
-          		{
-          			ListItem item = new ListItem(messages.get("INFRA"));	sectors.add(item);
-          		}
-          		if (paw.isManagedEcosystems()) 
-          		{
-          			ListItem item = new ListItem(messages.get("MECO"));	sectors.add(item);
-          		}
-          		if (paw.isNaturalEcosystems()) 
-          		{
-          			ListItem item = new ListItem(messages.get("NECO"));	sectors.add(item);
-          		}
-          		if (paw.isBiota()) 
-          		{
-          			ListItem item = new ListItem(messages.get("BIOTA")); sectors.add(item);
-          		}
-          		if (paw.isCultural()) 
-          		{
-          			ListItem item = new ListItem(messages.get("CULT"));	sectors.add(item);
-          		}
-          		if (paw.isEconomicResources()) 
-          		{
-          			ListItem item = new ListItem(messages.get("ECORES"));	sectors.add(item);
-          		}
-          		if (paw.isRecreationAndTourism()) 
-          		{
-          			ListItem item = new ListItem(messages.get("REC"));	sectors.add(item);
-          		}
-          		if (paw.isCrossDisciplinary()) 
-          		{
-          			ListItem item = new ListItem(messages.get("CROSS"));	sectors.add(item);
-          		}
-          		if (paw.isOtherSector()) 
-          		{
-          			ListItem item = new ListItem(messages.get("OSEC"));	sectors.add(item);
-          		}
-
-                if(sectors.size() > 0)
-                {
-          		  PdfPCell sectorsCell = new PdfPCell(); sectorsCell.addElement(sectors);
-          		  table.addCell(new PdfPCell(new Phrase("Sector"))); table.addCell(sectorsCell);
-                }
-
-          		
-          		
-          		
-          	    // compile the focus area list
-          		com.itextpdf.text.List focii = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (paw.isSustainability()) 
-          		{
-          			ListItem item = new ListItem(messages.get("SUSTAINABILITY"));	focii.add(item);
-          		}
-          		if (paw.isResilience()) 
-          		{
-          			ListItem item = new ListItem(messages.get("RESILIENCE"));	focii.add(item);
-          		}
-          		if (paw.isWater()) 
-          		{
-          			ListItem item = new ListItem(messages.get("WATER"));	focii.add(item);
-          		}
-          		if (paw.isExtremes()) 
-          		{
-          			ListItem item = new ListItem(messages.get("EXTREMES"));	focii.add(item);
-          		}
-          		if (paw.isConservation()) 
-          		{
-          			ListItem item = new ListItem(messages.get("CONSERVATION"));	focii.add(item);
-          		}
-          		
-          		if (focii.size() > 0)
-          		{
-          		  PdfPCell fociiCell = new PdfPCell(); fociiCell.addElement(focii);
-          		  table.addCell(new PdfPCell(new Phrase("Focus Area")));
-          		  table.addCell(fociiCell);
-          		}
-
-          		
-          		
-          		
-          	    // compile the regions list
-          		com.itextpdf.text.List regions = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (paw.isInternational()) 
-          		{
-          			ListItem item = new ListItem(messages.get("INT"));	regions.add(item);
-          		}
-          		if (paw.isNational()) 
-          		{
-          			ListItem item = new ListItem(messages.get("NAT"));	regions.add(item);
-          		}
-          		if (paw.isRegionalOrState()) 
-          		{
-          			String msg = messages.get("REG");
-          			
-          			if (paw.isNewEngland()) msg += " " + messages.get("NENG"); 
-          			if (paw.isMidAtlantic()) msg += " " + messages.get("MIDA"); 
-          			if (paw.isCentral()) msg += " " + messages.get("CENT"); 
-          			if (paw.isGreatLakes()) msg += " " + messages.get("GRTL"); 
-          			if (paw.isSouthEast()) msg += " " + messages.get("STHE"); 
-          			
-          			ListItem item = new ListItem(msg);	regions.add(item);
-          		}
-          		if (paw.isLocalCity()) 
-          		{
-          			ListItem item = new ListItem(messages.get("LOC"));	regions.add(item);
-          		}
-          		if (paw.isProblemFocused()) 
-          		{
-          			ListItem item = new ListItem(messages.get("OTH"));	regions.add(item);
-          		}
-          		
-                if(regions.size() > 0)
-                {
-          		  PdfPCell regionCell = new PdfPCell(); regionCell.addElement(regions);
-          		  table.addCell(new PdfPCell(new Phrase("Region")));table.addCell(regionCell);
-                }
-          		
-                
-                
-          		com.itextpdf.text.List status = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (paw.isOngoing()) 
-          		{
-          			ListItem item = new ListItem("Ongoing");	status.add(item);
-          		}
-          		if (paw.isPlanned()) 
-          		{
-          			ListItem item = new ListItem("Planned");	status.add(item);
-          		}
-          		if (paw.isProposed()) 
-          		{
-          			ListItem item = new ListItem("Proposed");	status.add(item);
-          		}
-          		if (paw.isCompleted()) 
-          		{
-          			ListItem item = new ListItem("Completed");	status.add(item);
-          		}
-                if(status.size() > 0)
-                {
-          		  PdfPCell statusCell = new PdfPCell(); statusCell.addElement(status);
-          		  table.addCell(new PdfPCell(new Phrase("Status")));table.addCell(statusCell);
-                }
-
-                
-                
-                
-                if (StringUtils.isNotBlank(paw.getDates()))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Timelines")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getDates()))));
-          		}
-                if (StringUtils.isNotBlank(paw.getResources()))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Resources")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getResources()))));
-          		}
-
-          		
-          		if (StringUtils.isNotBlank(paw.getOrganization()))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Lead Agencies")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getOrganization()))));
-          		}
-          		if (StringUtils.isNotBlank(paw.getContact()))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Contacts")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getContact()))));
-          		}
-
-
-
-          		document.add(table);
-          		document.add(Chunk.NEWLINE);
-      		}
-              
-              
-      } catch (DocumentException de) {
-              logger.fatal(de.getMessage());
-      }
-      catch (IOException ie)
-      {
-    	 logger.warn("Could not find NOAA logo (likely)");
-    	 logger.warn(ie);
-      }
-
-      // step 5: we close the document
-      document.close();
-      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-      return bais;
-}
 
   private Model getModel(Paw paw)
   {
@@ -1268,4 +1036,265 @@ public class Paws
 	   else value = TapestryInternalUtils.toUserPresentable(varName);
 	   return StringUtils.trimToEmpty(value);
   }
+  private PdfPTable getPDFTable(Paw paw)
+  {
+      // create table, 2 columns
+        PdfPTable table = new PdfPTable(2);
+        try
+        {
+          table.setWidths(new int[]{1, 4});
+        }
+        catch (Exception e)
+        {
+      	  logger.fatal("Could not setWidths???" + e );
+        }
+        table.setSplitRows(false);
+        
+  		String name = paw.getName();
+  		String description = paw.getDescription();
+        
+        PdfPCell nameTitle = new PdfPCell(new Phrase("Name")); 
+        PdfPCell nameCell = new PdfPCell(new Phrase(name));
+        
+        nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        
+        table.addCell(nameTitle);  table.addCell(nameCell);
+  		if (StringUtils.isNotBlank(description))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
+  		}
+  		
+  		
+  	    // compile the categories list
+  		com.itextpdf.text.List categories = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (paw.isSpecific()) 
+  		{
+  			ListItem item = new ListItem(messages.get("SPECIFIC"));	categories.add(item);
+  		}
+  		if (paw.isRetrofitted()) 
+  		{
+  			ListItem item = new ListItem(messages.get("RETRO"));	categories.add(item);
+  		}
+  		if (paw.isMonitoring()) 
+  		{
+  			ListItem item = new ListItem(messages.get("MONITOR"));	categories.add(item);
+  		}
+  		if (paw.isResearch()) 
+  		{
+  			ListItem item = new ListItem(messages.get("RESEARCH"));	categories.add(item);
+  		}
+  		if(categories.size() > 0)
+  		{
+    		  PdfPCell catCell = new PdfPCell(); catCell.addElement(categories);
+      		  table.addCell(new PdfPCell(new Phrase("Category"))); table.addCell(catCell);
+  		}
+  		
+  	    // compile the sectors list
+  		com.itextpdf.text.List sectors = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (paw.isPublicHealth()) 
+  		{
+  			ListItem item = new ListItem(messages.get("PUBLIC"));	sectors.add(item);
+  		}
+  		if (paw.isInfrastructure()) 
+  		{
+  			ListItem item = new ListItem(messages.get("INFRA"));	sectors.add(item);
+  		}
+  		if (paw.isManagedEcosystems()) 
+  		{
+  			ListItem item = new ListItem(messages.get("MECO"));	sectors.add(item);
+  		}
+  		if (paw.isNaturalEcosystems()) 
+  		{
+  			ListItem item = new ListItem(messages.get("NECO"));	sectors.add(item);
+  		}
+  		if (paw.isBiota()) 
+  		{
+  			ListItem item = new ListItem(messages.get("BIOTA")); sectors.add(item);
+  		}
+  		if (paw.isCultural()) 
+  		{
+  			ListItem item = new ListItem(messages.get("CULT"));	sectors.add(item);
+  		}
+  		if (paw.isEconomicResources()) 
+  		{
+  			ListItem item = new ListItem(messages.get("ECORES"));	sectors.add(item);
+  		}
+  		if (paw.isRecreationAndTourism()) 
+  		{
+  			ListItem item = new ListItem(messages.get("REC"));	sectors.add(item);
+  		}
+  		if (paw.isCrossDisciplinary()) 
+  		{
+  			ListItem item = new ListItem(messages.get("CROSS"));	sectors.add(item);
+  		}
+  		if (paw.isOtherSector()) 
+  		{
+  			ListItem item = new ListItem(messages.get("OSEC"));	sectors.add(item);
+  		}
+
+        if(sectors.size() > 0)
+        {
+  		  PdfPCell sectorsCell = new PdfPCell(); sectorsCell.addElement(sectors);
+  		  table.addCell(new PdfPCell(new Phrase("Sector"))); table.addCell(sectorsCell);
+        }
+
+  		
+  		
+  		
+  	    // compile the focus area list
+  		com.itextpdf.text.List focii = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (paw.isSustainability()) 
+  		{
+  			ListItem item = new ListItem(messages.get("SUSTAINABILITY"));	focii.add(item);
+  		}
+  		if (paw.isResilience()) 
+  		{
+  			ListItem item = new ListItem(messages.get("RESILIENCE"));	focii.add(item);
+  		}
+  		if (paw.isWater()) 
+  		{
+  			ListItem item = new ListItem(messages.get("WATER"));	focii.add(item);
+  		}
+  		if (paw.isExtremes()) 
+  		{
+  			ListItem item = new ListItem(messages.get("EXTREMES"));	focii.add(item);
+  		}
+  		if (paw.isConservation()) 
+  		{
+  			ListItem item = new ListItem(messages.get("CONSERVATION"));	focii.add(item);
+  		}
+  		
+  		if (focii.size() > 0)
+  		{
+  		  PdfPCell fociiCell = new PdfPCell(); fociiCell.addElement(focii);
+  		  table.addCell(new PdfPCell(new Phrase("Focus Area")));
+  		  table.addCell(fociiCell);
+  		}
+
+  		
+  		
+  		
+  	    // compile the regions list
+  		com.itextpdf.text.List regions = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (paw.isInternational()) 
+  		{
+  			ListItem item = new ListItem(messages.get("INT"));	regions.add(item);
+  		}
+  		if (paw.isNational()) 
+  		{
+  			ListItem item = new ListItem(messages.get("NAT"));	regions.add(item);
+  		}
+  		if (paw.isRegionalOrState()) 
+  		{
+  			String msg = messages.get("REG");
+  			
+  			if (paw.isNewEngland()) msg += " " + messages.get("NENG"); 
+  			if (paw.isMidAtlantic()) msg += " " + messages.get("MIDA"); 
+  			if (paw.isCentral()) msg += " " + messages.get("CENT"); 
+  			if (paw.isGreatLakes()) msg += " " + messages.get("GRTL"); 
+  			if (paw.isSouthEast()) msg += " " + messages.get("STHE"); 
+  			
+  			ListItem item = new ListItem(msg);	regions.add(item);
+  		}
+  		if (paw.isLocalCity()) 
+  		{
+  			ListItem item = new ListItem(messages.get("LOC"));	regions.add(item);
+  		}
+  		if (paw.isProblemFocused()) 
+  		{
+  			ListItem item = new ListItem(messages.get("OTH"));	regions.add(item);
+  		}
+  		
+        if(regions.size() > 0)
+        {
+  		  PdfPCell regionCell = new PdfPCell(); regionCell.addElement(regions);
+  		  table.addCell(new PdfPCell(new Phrase("Region")));table.addCell(regionCell);
+        }
+  		
+        
+        
+  		com.itextpdf.text.List status = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (paw.isOngoing()) 
+  		{
+  			ListItem item = new ListItem("Ongoing");	status.add(item);
+  		}
+  		if (paw.isPlanned()) 
+  		{
+  			ListItem item = new ListItem("Planned");	status.add(item);
+  		}
+  		if (paw.isProposed()) 
+  		{
+  			ListItem item = new ListItem("Proposed");	status.add(item);
+  		}
+  		if (paw.isCompleted()) 
+  		{
+  			ListItem item = new ListItem("Completed");	status.add(item);
+  		}
+        if(status.size() > 0)
+        {
+  		  PdfPCell statusCell = new PdfPCell(); statusCell.addElement(status);
+  		  table.addCell(new PdfPCell(new Phrase("Status")));table.addCell(statusCell);
+        }
+
+        
+        
+        
+        if (StringUtils.isNotBlank(paw.getDates()))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Timelines")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getDates()))));
+  		}
+        if (StringUtils.isNotBlank(paw.getResources()))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Resources")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getResources()))));
+  		}
+
+  		
+  		if (StringUtils.isNotBlank(paw.getOrganization()))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Lead Agencies")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getOrganization()))));
+  		}
+  		if (StringUtils.isNotBlank(paw.getContact()))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Contacts")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(paw.getContact()))));
+  		}
+
+
+     return table; 
+  }
+ 
+
+  private com.itextpdf.text.Image getLogo()
+   {
+     java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
+ 	  try
+ 	  {
+	    com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null);
+	    logo.scalePercent(50);
+	    return logo;
+ 	  }
+ 	  catch (Exception e)
+ 	  {
+ 		 logger.warn("Could not generate logo " + e);
+ 	  }
+	  
+      return null;
+   }
+   private String getHeader(String prefix)
+   {
+	      DateFormat formatter = new SimpleDateFormat
+                  ("EEE MMM dd HH:mm:ss zzz yyyy");
+              Date date = new Date(System.currentTimeMillis());
+              TimeZone eastern = TimeZone.getTimeZone("Pacific/Honolulu");
+              formatter.setTimeZone(eastern);
+              
+      return prefix + formatter.format(date); 
+   }
+   private PDFStreamResponse getResponse (String prefix, ByteArrayOutputStream baos)
+   {
+     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+     DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy.HH.mm.ss.zzz");
+     return new PDFStreamResponse(bais, prefix + "_generated_on_" + formatter.format(new Date(System.currentTimeMillis())));
+     //return new PDFStreamResponse(bais, prefix);
+   }
+  
 }

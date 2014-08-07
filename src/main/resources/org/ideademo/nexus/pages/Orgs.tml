@@ -24,8 +24,9 @@
                    <input t:type="TextField" t:id="searchText" class="searchBox" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
-                   <t:submit t:id="pdf" name="Run Report" value="PDF" /> 
-                   <t:submit t:id="rdf" name="RDF Dump" value="RDF" />                
+                   <t:submit t:id="pdf" name="PDF" value="PDF" hidden="hidden" />
+                   <t:pagelink page="pdf/Orgs" target="_blank">PDF</t:pagelink>               
+                   <t:submit t:id="rdf" name="RDF Dump" value="RDF" hidden="hidden" />                
                 </td>
 		      </tr>
 		    </table>
@@ -82,7 +83,7 @@
      
      <tr>
       <td width="67" style="width: 67px">Description</td>
-      <td>${row.description}(<t:pagelink page="org/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+      <td>${row.description}(<t:pagelink page="org/view" context="row.id" target="_blank">More&hellip;</t:pagelink>/<a t:type="eventlink" t:event="returnstreamresponse" context="row.id" href="#">PDF</a>)</td>
      </tr>
 
      <tr>

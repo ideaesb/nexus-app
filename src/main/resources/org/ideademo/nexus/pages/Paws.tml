@@ -45,8 +45,9 @@
                    <input t:type="TextField" t:id="searchText" class="searchBox" value="searchText" />
                    <t:submit t:id="search" value="Go" />
                    <t:submit t:id="clear" value="Clear/Show All" />
-                   <t:submit t:id="pdf" name="Run Report" value="PDF" /> 
-                   <t:submit t:id="rdf" name="RDF Dump" value="RDF" />                
+                   <t:submit t:id="pdf" name="PDF" value="PDF" hidden="hidden" />
+                   <t:pagelink page="pdf/Paws" target="_blank">PDF</t:pagelink>               
+                   <t:submit t:id="rdf" name="RDF Dump" value="RDF" hidden="hidden"  />
                 </td>
 		      </tr>
 		    </table>
@@ -83,7 +84,7 @@
      </colgroup>
      <tr>
       <td>Description</td>
-      <td>${row.description}(<t:pagelink page="paw/view" context="row.id" target="_blank">More&hellip;</t:pagelink>)</td>
+      <td>${row.description}(<t:pagelink page="paw/view" context="row.id" target="_blank">More&hellip;</t:pagelink>/<a t:type="eventlink" t:event="returnstreamresponse" context="row.id" href="#">PDF</a>)</td>
      </tr>
      
           
@@ -190,7 +191,8 @@
   </div><!-- End of "container 2" -->
  </div><!-- End of "container 3" -->
  <div style="float:right;width:280px;word-spacing:6px;font-size:80%;padding-right:10px;padding-top:2px;color:#888888;white-space:nowrap;text-align:right;">
-  ${retrieved} of ${total} records</div>
+ ${retrieved} of ${total} records</div>
+  
 
   
     

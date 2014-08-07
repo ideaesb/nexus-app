@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.internal.TapestryInternalUtils;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -37,8 +36,10 @@ import org.apache.tapestry5.hibernate.HibernateSessionManager;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 
+
 //semantic web
 import com.hp.hpl.jena.rdf.model.*;
+
 import org.ideademo.nexus.vocabulary.NXS;
 
 
@@ -70,6 +71,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 
 
+
 import org.ideademo.nexus.entities.Org;
 
 
@@ -85,7 +87,7 @@ public class Orgs
   
   /////////////////////////////
   //  Drives QBE Search
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private Org example;
   
   
@@ -96,7 +98,7 @@ public class Orgs
   private Org row;
 
   @Property
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   private String searchText;
 
   @Inject
@@ -106,11 +108,11 @@ public class Orgs
   private HibernateSessionManager sessionManager;
 
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int retrieved; 
   
   @Property 
-  @Persist (PersistenceConstants.FLASH)
+  @Persist
   int total;
   
   @Inject
@@ -380,389 +382,286 @@ public class Orgs
   
   public StreamResponse onSelectedFromPdf() 
   {
-      // Create PDF
-      InputStream is = getPdfTable(getList());
-      // Return response
-      return new PDFStreamResponse(is,"neXusOrganizations" + System.currentTimeMillis());
-  }
+     List<Org> list = getList();
+     String subheader = "Printing " + retrieved + " of total " + total + " records.";
+     if (StringUtils.isNotBlank(searchText))
+     {
+    	  subheader += "  Searching for \"" + searchText + "\""; 
+     }
+     
+     
+     Document document = new Document();
+     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+     try
+     {
+         PdfWriter writer = PdfWriter.getInstance(document, baos);
+         document.open();
+         document.add(getLogo());
+         document.add(new Paragraph(getHeader("NExUS Programs and Organizations ")));
+         document.add(new Paragraph(subheader));
+         document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+         Iterator<Org> iterator = list.iterator();
+         while (iterator.hasNext())
+         {
+        	 Org o = iterator.next();
+        	 document.add(getPDFTable(o));
+        	 document.add(Chunk.NEWLINE);
+         }
+         document.close();
+     }
+     catch (Exception e)
+     {
+   	  logger.warn("Error generating PDF Doc " + e);
+     }
+     return getResponse ("NExUS_Organizations", baos);  
+   }
 
-  private InputStream getPdfTable(List list) 
+  public StreamResponse onReturnStreamResponse(long id) 
   {
-
-      // step 1: creation of a document-object
       Document document = new Document();
-
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-      try {
-              // step 2:
-              // we create a writer that listens to the document
-              // and directs a PDF-stream to a file
-              PdfWriter writer = PdfWriter.getInstance(document, baos);
-              // step 3: we open the document
-              document.open();
-              
-              java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
-              if (awtImage != null)
-              {
-            	  com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null); 
-            	  if (logo != null) document.add(logo);
-              }
-
-              DateFormat formatter = new SimpleDateFormat
-                      ("EEE MMM dd HH:mm:ss zzz yyyy");
-                  Date date = new Date(System.currentTimeMillis());
-                  TimeZone eastern = TimeZone.getTimeZone("America/New_York");
-                  formatter.setTimeZone(eastern);
-
-              document.add(new Paragraph("NEClimateUS.org Partners Report " + formatter.format(date)));
-              
-              String subheader = "Printing " + retrieved + " of total " + total + " records.";
-              if (StringUtils.isNotBlank(searchText))
-              {
-            	  subheader += "  Searching for \"" + searchText + "\""; 
-              }
-              
-              document.add(new Paragraph(subheader));
-              document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
-              
-              // create table, 2 columns
-           	Iterator<Org> iterator = list.iterator();
-           	int count=0;
-       		while(iterator.hasNext())
-      		{
-       			count++;
-          		Org org = iterator.next();
-          		
-          		String name = org.getName();
-          		String description = org.getDescription();
-          		String url = org.getUrl();
-          		
-                PdfPTable table = new PdfPTable(2);
-                table.setWidths(new int[]{1, 4});
-                table.setSplitRows(false);
-                
-                
- 	
-                
-                
-                PdfPCell nameTitle = new PdfPCell(new Phrase("#" + count + ") Name")); 
-                PdfPCell nameCell = new PdfPCell(new Phrase(name));
-                
-                nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                
-                table.addCell(nameTitle);  table.addCell(nameCell);          		          		
-          		
-          		if (StringUtils.isNotBlank(url))
-          		{
-            	  Anchor link = new Anchor(StringUtils.trimToEmpty(url)); link.setReference(StringUtils.trimToEmpty(url));
-          		  table.addCell(new PdfPCell(new Phrase("Web")));  table.addCell(new PdfPCell(link));
-          		}
-
-          		if (StringUtils.isNotBlank(description))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
-          		}
-          		
-          		
-          		
-          		
-          	    // compile the disciples list
-          		com.itextpdf.text.List types = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
-          		if (org.isPartner()) 
-          		{
-          			ListItem item = new ListItem("Partner"); types.add(item);
-          		}
-          		if (org.isProgram()) 
-          		{
-          			ListItem item = new ListItem("Program"); types.add(item);
-          		}
-          		if (org.isFederal()) 
-          		{
-          			ListItem item = new ListItem("Federal"); types.add(item);
-          		}
-          		if (org.isState()) 
-          		{
-          			ListItem item = new ListItem("State"); types.add(item);
-          		}
-          		if (org.isLocal()) 
-          		{
-          			ListItem item = new ListItem("Local"); types.add(item);
-          		}
-          		if (org.isInteragency()) 
-          		{
-          			ListItem item = new ListItem("Interagency"); types.add(item);
-          		}
-          		if (org.isAcademic()) 
-          		{
-          			ListItem item = new ListItem("Academic"); types.add(item);
-          		}
-          		if (org.isNgo()) 
-          		{
-          			ListItem item = new ListItem("Non-governmental Organization (NGO)"); types.add(item);
-          		}
-          		if (org.isOtherPartnerType()) 
-          		{
-          			ListItem item = new ListItem("Unclassified/Other"); types.add(item);
-          		}
-
-
-          		if(types.size() > 0)
-          		{
-          		  PdfPCell typesCell = new PdfPCell(); typesCell.addElement(types);
-          		  table.addCell(new PdfPCell(new Phrase("Types")));  table.addCell(typesCell);
-          		}
-
-          		
-          		
-          		if (StringUtils.isNotBlank(org.getContact()))
-          		{
-          		  table.addCell(new PdfPCell(new Phrase("Contacts")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(org.getContact()))));
-          		}
-
-          		document.add(table);
-          		document.add(Chunk.NEWLINE);
-      		}
-              
-              
-      } catch (DocumentException de) {
-              logger.fatal(de.getMessage());
-      }
-      catch (IOException ie)
+      try
       {
-    	 logger.warn("Could not find NOAA logo (likely)");
-    	 logger.warn(ie);
+          PdfWriter writer = PdfWriter.getInstance(document, baos);
+          document.open();
+          document.add(getLogo());
+          document.add(new Paragraph(getHeader("NExUS Programs and Organizations ")));
+          document.add(Chunk.NEWLINE);document.add(Chunk.NEWLINE);
+          Org o =  (Org) session.load(Org.class, id);
+          document.add(getPDFTable(o));
+          document.close();
       }
+      catch (Exception e)
+      {
+    	  logger.warn("Error generating PDF Doc " + e);
+      }
+     return getResponse ("NExUS_Organizations", baos);  
+  }	  
 
-      // step 5: we close the document
-      document.close();
-      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-      return bais;
-}
 
   ///////////////////////////////
   // semantic web
 	
-	   private Model getModel(Org org)
-	   {
-	       Model model = ModelFactory.createDefaultModel();
-	       
-	       Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/org/view/"+ org.getId());
+   private Model getModel(Org org)
+   {
+       Model model = ModelFactory.createDefaultModel();
+       
+       Resource resource = ResourceFactory.createResource("http://neclimateus.org/nexus/org/view/"+ org.getId());
 
-	       if (StringUtils.isNotBlank(org.getName())) 
-	   	   {
-	    	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(org.getName()));
-	       }
-	       else
-	       {
-	    	   model.add (resource, NXS.Name, "Organization with no Title???");
-	       }
-	       
-	       if (StringUtils.isNotBlank(org.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(org.getCode()));
-	       if (StringUtils.isNotBlank(org.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(org.getContact()));
-	       if (StringUtils.isNotBlank(org.getEmail())) model.add(resource, NXS.Email, StringUtils.trimToEmpty(org.getEmail()));
-	       if (StringUtils.isNotBlank(org.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(org.getDescription()));
-	       if (StringUtils.isNotBlank(org.getAffiliations())) model.add(resource, NXS.Affiliations, StringUtils.trimToEmpty(org.getAffiliations()));
-	       if (StringUtils.isNotBlank(org.getUrl())) model.add(resource, NXS.Homepage, StringUtils.trimToEmpty(org.getUrl()));
-	       if (StringUtils.isNotBlank(org.getLogo())) model.add(resource, NXS.Logo, StringUtils.trimToEmpty(org.getLogo()));
-	       if (StringUtils.isNotBlank(org.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(org.getWorksheet()));
-	       if (StringUtils.isNotBlank(org.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(org.getKeywords()));
-	       
-	       
-	       if (org.isFederal())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("federal"));  
-	       }
-	       if (org.isProvince())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("province")); 
-	       }
-	       if (org.isState())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("state")); 
-	       }
-	       if (org.isLocal())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("local"));
-	       }
-	       if (org.isInteragency())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("interagency")); 
-	       }
-	       if (org.isAcademic())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("academic")); 
-	       }
-	       if (org.isNgo())
-	       {
-	    	   model.add(resource, NXS.Organization_Type, getLabel("ngo")); 
-	       }
-	       if (org.isOtherPartnerType())
-	       {
-	    	  model.add(resource, NXS.Organization_Type, getLabel("otherPartnerType")); 
-	       }
-	       else 
-	       {
-	    	  //model.add(resource, NXS.Organization_Type, "Unspecified"); // TODO - these should be labels or URIs
-	       }
-	       
-	      
-	       
-	       if (org.isInternational())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
-	       }
-	       if (org.isCanada())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
-	       }
-	       if (org.isNewBrunswick())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
-	       }
-	       if (org.isNovaScotia())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
-	       }
-	       if (org.isQuebec())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
-	       }
-	       if (org.isPrinceEdwardIsland())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
-	       }
-	       if (org.isNewfoundland())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
-	       }
-	       if (org.isLabrador())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
-	       }
-	       if (org.isAtlanticCanada())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
-	       }
-	       if (org.isNational())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
-	       }
-	       if (org.isRegionalOrState())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
-	       }
-	       if (org.isGulfOfMaine())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
-	       }
-	       if (org.isNewEngland())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
-	       }
-	       if (org.isMaine())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
-	       }
-	       if (org.isNewHampshire())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
-	       }
-	       if (org.isMassachusetts())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
-	       }
-	       if (org.isVermont())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
-	       }
-	       if (org.isConnecticut())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
-	       }
-	       if (org.isRhodeIsland())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
-	       }
-	       if (org.isMidAtlantic())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
-	       }
-	       if (org.isNewYork())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
-	       }
-	       if (org.isNewJersey())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
-	       }
-	       if (org.isPennsylvania())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
-	       }
-	       if (org.isMarlyland())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
-	       }
-	       if (org.isDelaware())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
-	       }
-	       if (org.isVirginia())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
-	       }
-	       if (org.isDistrictOfColumbia())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
-	       }
-	       if (org.isCentral())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
-	       }
-	       if (org.isWestVirginia())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
-	       }
-	       if (org.isGreatLakes())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
-	       }
-	       if (org.isOhio())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
-	       }
-	       if (org.isSouthEast())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
-	       }
-	       if (org.isNorthCarolina())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
-	       }
-	       if (org.isSouthCarolina())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
-	       }
-	       if (org.isLocalCity())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
-	       }
-	       if (org.isProblemFocused())
-	       {
-	    	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
-	       }
-	       else 
-	       {
-	    	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
-	       }
-    
-	       
-	       
-	       
-	       return model;
+       if (StringUtils.isNotBlank(org.getName())) 
+   	   {
+    	   model.add (resource, NXS.Name, StringUtils.trimToEmpty(org.getName()));
+       }
+       else
+       {
+    	   model.add (resource, NXS.Name, "Organization with no Title???");
+       }
+       
+       if (StringUtils.isNotBlank(org.getCode())) model.add(resource, NXS.Acronym, StringUtils.trimToEmpty(org.getCode()));
+       if (StringUtils.isNotBlank(org.getContact())) model.add(resource, NXS.Contact, StringUtils.trimToEmpty(org.getContact()));
+       if (StringUtils.isNotBlank(org.getEmail())) model.add(resource, NXS.Email, StringUtils.trimToEmpty(org.getEmail()));
+       if (StringUtils.isNotBlank(org.getDescription())) model.add(resource, NXS.Description, StringUtils.trimToEmpty(org.getDescription()));
+       if (StringUtils.isNotBlank(org.getAffiliations())) model.add(resource, NXS.Affiliations, StringUtils.trimToEmpty(org.getAffiliations()));
+       if (StringUtils.isNotBlank(org.getUrl())) model.add(resource, NXS.Homepage, StringUtils.trimToEmpty(org.getUrl()));
+       if (StringUtils.isNotBlank(org.getLogo())) model.add(resource, NXS.Logo, StringUtils.trimToEmpty(org.getLogo()));
+       if (StringUtils.isNotBlank(org.getWorksheet())) model.add(resource, NXS.Worksheet, StringUtils.trimToEmpty(org.getWorksheet()));
+       if (StringUtils.isNotBlank(org.getKeywords())) model.add(resource, NXS.Keywords, StringUtils.trimToEmpty(org.getKeywords()));
+       
+       
+       if (org.isFederal())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("federal"));  
+       }
+       if (org.isProvince())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("province")); 
+       }
+       if (org.isState())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("state")); 
+       }
+       if (org.isLocal())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("local"));
+       }
+       if (org.isInteragency())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("interagency")); 
+       }
+       if (org.isAcademic())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("academic")); 
+       }
+       if (org.isNgo())
+       {
+    	   model.add(resource, NXS.Organization_Type, getLabel("ngo")); 
+       }
+       if (org.isOtherPartnerType())
+       {
+    	  model.add(resource, NXS.Organization_Type, getLabel("otherPartnerType")); 
+       }
+       else 
+       {
+    	  //model.add(resource, NXS.Organization_Type, "Unspecified"); // TODO - these should be labels or URIs
+       }
+       
+      
+       
+       if (org.isInternational())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("international")); 
+       }
+       if (org.isCanada())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("canada"));  
+       }
+       if (org.isNewBrunswick())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newBrunswick"));  
+       }
+       if (org.isNovaScotia())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("novaScotia"));  
+       }
+       if (org.isQuebec())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("quebec"));  
+       }
+       if (org.isPrinceEdwardIsland())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("princeEdwardIsland"));  
+       }
+       if (org.isNewfoundland())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newfoundland"));  
+       }
+       if (org.isLabrador())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("labrador"));  
+       }
+       if (org.isAtlanticCanada())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("atlanticCanada"));  
+       }
+       if (org.isNational())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("national"));  
+       }
+       if (org.isRegionalOrState())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("regionalOrState"));  
+       }
+       if (org.isGulfOfMaine())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("gulfOfMaine"));  
+       }
+       if (org.isNewEngland())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newEngland"));  
+       }
+       if (org.isMaine())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("maine"));  
+       }
+       if (org.isNewHampshire())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newHampshire"));  
+       }
+       if (org.isMassachusetts())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("massachusetts"));  
+       }
+       if (org.isVermont())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("vermont"));  
+       }
+       if (org.isConnecticut())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("connecticut"));  
+       }
+       if (org.isRhodeIsland())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("rhodeIsland"));  
+       }
+       if (org.isMidAtlantic())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("midAtlantic"));  
+       }
+       if (org.isNewYork())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newYork"));  
+       }
+       if (org.isNewJersey())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("newJersey"));  
+       }
+       if (org.isPennsylvania())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("pennsylvania"));  
+       }
+       if (org.isMarlyland())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("marlyland"));  
+       }
+       if (org.isDelaware())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("delaware"));  
+       }
+       if (org.isVirginia())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("virginia"));  
+       }
+       if (org.isDistrictOfColumbia())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("districtOfColumbia"));  
+       }
+       if (org.isCentral())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("central"));  
+       }
+       if (org.isWestVirginia())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("westVirginia"));  
+       }
+       if (org.isGreatLakes())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("greatLakes"));  
+       }
+       if (org.isOhio())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("ohio"));  
+       }
+       if (org.isSouthEast())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southEast"));  
+       }
+       if (org.isNorthCarolina())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("northCarolina"));  
+       }
+       if (org.isSouthCarolina())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("southCarolina"));  
+       }
+       if (org.isLocalCity())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("localCity"));  
+       }
+       if (org.isProblemFocused())
+       {
+    	 model.add(resource, NXS.Area_of_Applicability, getLabel("problemFocused"));  
+       }
+       else 
+       {
+    	 //model.add(resource, NXS.Area_of_Applicability, "Unspecified");  
+       }
 
-	   }	
+       
+       
+       
+       return model;
+
+   }	
  
   private String getLabel (String varName)
   {
@@ -772,6 +671,137 @@ public class Orgs
 	   else value = TapestryInternalUtils.toUserPresentable(varName);
 	   return StringUtils.trimToEmpty(value);
   }
+  private PdfPTable getPDFTable(Org org)
+  {
+      // create table, 2 columns
+        PdfPTable table = new PdfPTable(2);
+        try
+        {
+          table.setWidths(new int[]{1, 4});
+        }
+        catch (Exception e)
+        {
+      	  logger.fatal("Could not setWidths???" + e );
+        }
+        table.setSplitRows(false);
+  		
+  		String name = org.getName();
+  		String description = org.getDescription();
+  		String url = org.getUrl();
+  		
+        
+        PdfPCell nameTitle = new PdfPCell(new Phrase("Name")); 
+        PdfPCell nameCell = new PdfPCell(new Phrase(name));
+        
+        nameTitle.setBackgroundColor(BaseColor.CYAN);  nameCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        
+        table.addCell(nameTitle);  table.addCell(nameCell);          		          		
+  		
+  		if (StringUtils.isNotBlank(url))
+  		{
+    	  Anchor link = new Anchor(StringUtils.trimToEmpty(url)); link.setReference(StringUtils.trimToEmpty(url));
+  		  table.addCell(new PdfPCell(new Phrase("Web")));  table.addCell(new PdfPCell(link));
+  		}
+
+  		if (StringUtils.isNotBlank(description))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Description")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(description))));
+  		}
+  		
+  		
+  		
+  		
+  	    // compile the disciples list
+  		com.itextpdf.text.List types = new com.itextpdf.text.List(com.itextpdf.text.List.UNORDERED);
+  		if (org.isPartner()) 
+  		{
+  			ListItem item = new ListItem("Partner"); types.add(item);
+  		}
+  		if (org.isProgram()) 
+  		{
+  			ListItem item = new ListItem("Program"); types.add(item);
+  		}
+  		if (org.isFederal()) 
+  		{
+  			ListItem item = new ListItem("Federal"); types.add(item);
+  		}
+  		if (org.isState()) 
+  		{
+  			ListItem item = new ListItem("State"); types.add(item);
+  		}
+  		if (org.isLocal()) 
+  		{
+  			ListItem item = new ListItem("Local"); types.add(item);
+  		}
+  		if (org.isInteragency()) 
+  		{
+  			ListItem item = new ListItem("Interagency"); types.add(item);
+  		}
+  		if (org.isAcademic()) 
+  		{
+  			ListItem item = new ListItem("Academic"); types.add(item);
+  		}
+  		if (org.isNgo()) 
+  		{
+  			ListItem item = new ListItem("Non-governmental Organization (NGO)"); types.add(item);
+  		}
+  		if (org.isOtherPartnerType()) 
+  		{
+  			ListItem item = new ListItem("Unclassified/Other"); types.add(item);
+  		}
+
+
+  		if(types.size() > 0)
+  		{
+  		  PdfPCell typesCell = new PdfPCell(); typesCell.addElement(types);
+  		  table.addCell(new PdfPCell(new Phrase("Types")));  table.addCell(typesCell);
+  		}
+
+  		
+  		
+  		if (StringUtils.isNotBlank(org.getContact()))
+  		{
+  		  table.addCell(new PdfPCell(new Phrase("Contacts")));  table.addCell(new PdfPCell(new Phrase(StringUtils.trimToEmpty(org.getContact()))));
+  		}
+
+        
+     return table; 
+  }
+ 
+
+  private com.itextpdf.text.Image getLogo()
+   {
+     java.awt.Image awtImage = Toolkit.getDefaultToolkit().createImage(logoAsset.getResource().toURL());
+ 	  try
+ 	  {
+	    com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(awtImage, null);
+	    logo.scalePercent(50);
+	    return logo;
+ 	  }
+ 	  catch (Exception e)
+ 	  {
+ 		 logger.warn("Could not generate logo " + e);
+ 	  }
+	  
+      return null;
+   }
+   private String getHeader(String prefix)
+   {
+	      DateFormat formatter = new SimpleDateFormat
+                  ("EEE MMM dd HH:mm:ss zzz yyyy");
+              Date date = new Date(System.currentTimeMillis());
+              TimeZone eastern = TimeZone.getTimeZone("Pacific/Honolulu");
+              formatter.setTimeZone(eastern);
+              
+      return prefix + formatter.format(date); 
+   }
+   private PDFStreamResponse getResponse (String prefix, ByteArrayOutputStream baos)
+   {
+     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+     DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy.HH.mm.ss.zzz");
+     return new PDFStreamResponse(bais, prefix + "_generated_on_" + formatter.format(new Date(System.currentTimeMillis())));
+     //return new PDFStreamResponse(bais, prefix);
+   }
 
 
 }
